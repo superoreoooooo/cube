@@ -7,13 +7,18 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.oreoprojekt.cube.CUBE;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class cubeUtil {
+
+    Boolean timer = false;
+    BukkitScheduler scheduler = Bukkit.getScheduler();
+
     private final CUBE plugin;
 
     public cubeUtil(CUBE plugin) {
@@ -22,18 +27,16 @@ public class cubeUtil {
 
     public int getCount() {
         return plugin.ymlManager.getConfig().getInt("count");
-    }
-
-
-    Boolean timer = false;
+    } // 방 개수 리턴
 
     public void printAllRoomLocation(Player player) {
         for (int rn = 0; rn < getCount(); rn++) {
             player.sendMessage(ChatColor.GRAY + "ROOM_NUMBER : " + rn + " / ROOM_X : " + plugin.ymlManager.getConfig().getInt("room." + rn + ".loc." + "locX") + " / ROOM_Z : " + plugin.ymlManager.getConfig().getInt("room." + rn + ".loc." + "locZ"));
         }
-    }
+    } // 모든 방 리스트 출력
 
     public void movePlayer(Player player, boolean hasKey) {
+        clearEffect(player);
         int[] playerLoc = getCubePos(player);
         if (getCubeNumber(playerLoc) == -1) {
             player.sendMessage(ChatColor.RED + "ERROR_NOT_IN_ROOM");
@@ -115,7 +118,8 @@ public class cubeUtil {
                 }
                 break;
         }
-    }
+        giveEffect(player);
+    } // 플레이어 이동 이후 알고리즘 수정예정
 
     public int[] getCubePos(Player player) {
         int[] playerPos = new int[3];
@@ -150,7 +154,7 @@ public class cubeUtil {
             }
         }
         return -1;
-    }
+    } // 플레이어의 위치를 큐브 좌표계로 변환 후 리턴
 
     public boolean cubeCheck(int[] playerLoc) {
         for (int roomNo = 0; roomNo < getCount(); roomNo++) {
@@ -163,11 +167,10 @@ public class cubeUtil {
 
     public void checkMain() {
         if (getCount() > 0) return;
-        genMainCube();
-    }
+        generateMainCube();
+    } // 메인 큐브 여부 확인 솔직히 쓸데없음
 
-    public void genMainCube() {
-        Bukkit.broadcastMessage(ChatColor.GREEN + "GENERATE_MAIN");
+    public void generateMainCube() {
         plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locX", 0);
         plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locY", 10);
         plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locZ", 0);
@@ -176,7 +179,6 @@ public class cubeUtil {
         plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", false);
         plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", false);
         plugin.ymlManager.getConfig().set("room." + getCount() + ".type", "spawn");
-        Bukkit.broadcastMessage("ROOM_COUNT_ : " + getCount());
         plugin.ymlManager.getConfig().set("count", getCount() + 1);
         plugin.ymlManager.saveConfig();
         int originX = 0;
@@ -191,7 +193,7 @@ public class cubeUtil {
 
         for (int x = 0; x < 23; x++) {
             for (int z = 0; z < 23; z++) {
-                for (int y = 0; y < 50; y++) {
+                for (int y = 0; y < 23; y++) {
                     origin.getBlock().setType(ex.getBlock().getType());
                     origin.set(originX + x, originY + y, originZ + z);
                     ex.set(exX + x, exY + y, exZ + z);
@@ -207,11 +209,13 @@ public class cubeUtil {
         int originZ = 0;
 
         Random random = new Random();
-        int cubeShape = random.nextInt(9);
+        int cubeType = random.nextInt(6);
+        cubeType += 1;
+        int tickLeft = 201;
 
         int exX = 10000;
         int exY = 4;
-        int exZ = 10000 + (23 * cubeShape);
+        int exZ = 10000;
 
         switch (player.getFacing()) {
             case EAST:
@@ -224,7 +228,7 @@ public class cubeUtil {
                     return;
                 }
 
-                Bukkit.getConsoleSender().sendMessage(player.getName().toString() + " : " +  ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_EAST " + ChatColor.WHITE + getCount());
+                Bukkit.getConsoleSender().sendMessage(player.getName() + " : " +  ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_EAST " + ChatColor.WHITE + getCount());
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locX", playerLoc[0]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locY", playerLoc[1]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locZ", playerLoc[2]);
@@ -232,7 +236,6 @@ public class cubeUtil {
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorN", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", true);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", false);
-                plugin.ymlManager.getConfig().set("room." + getCount() + ".type", "normal");
                 break;
             case NORTH:
                 plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorN", true);
@@ -244,7 +247,7 @@ public class cubeUtil {
                     return;
                 }
 
-                Bukkit.getConsoleSender().sendMessage(player.getName().toString() + " : " +  ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_NORTH " + ChatColor.WHITE + getCount());
+                Bukkit.getConsoleSender().sendMessage(player.getName() + " : " +  ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_NORTH " + ChatColor.WHITE + getCount());
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locX", playerLoc[0]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locY", playerLoc[1]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locZ", playerLoc[2]);
@@ -252,7 +255,6 @@ public class cubeUtil {
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorN", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", true);
-                plugin.ymlManager.getConfig().set("room." + getCount() + ".type", "normal");
                 break;
             case WEST:
                 plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorW", true);
@@ -264,7 +266,7 @@ public class cubeUtil {
                     return;
                 }
 
-                Bukkit.getConsoleSender().sendMessage(player.getName().toString() + " : " +  ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_WEST " + ChatColor.WHITE + getCount());
+                Bukkit.getConsoleSender().sendMessage(player.getName() + " : " +  ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_WEST " + ChatColor.WHITE + getCount());
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locX", playerLoc[0]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locY", playerLoc[1]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locZ", playerLoc[2]);
@@ -272,7 +274,6 @@ public class cubeUtil {
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorN", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", false);
-                plugin.ymlManager.getConfig().set("room." + getCount() + ".type", "normal");
                 break;
             case SOUTH:
                 plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorS", true);
@@ -284,7 +285,7 @@ public class cubeUtil {
                     return;
                 }
 
-                Bukkit.getConsoleSender().sendMessage(player.getName().toString() + " : " + ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_SOUTH " + ChatColor.WHITE + getCount());
+                Bukkit.getConsoleSender().sendMessage(player.getName() + " : " + ChatColor.LIGHT_PURPLE + "GENERATE_ROOM_SOUTH " + ChatColor.WHITE + getCount());
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locX", playerLoc[0]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locY", playerLoc[1]);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".loc." + "locZ", playerLoc[2]);
@@ -292,11 +293,17 @@ public class cubeUtil {
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorN", true);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", false);
-                plugin.ymlManager.getConfig().set("room." + getCount() + ".type", "normal");
                 break;
         }
+
+        plugin.ymlManager.getConfig().set("room." + getCount() + ".effect", randomEffect());
+        plugin.ymlManager.getConfig().set("room." + getCount() + ".type", cubeType);
+        plugin.ymlManager.getConfig().set("room." + getCount() + ".tickLeft", tickLeft);
+
         int cnt = getCount();
+
         plugin.ymlManager.getConfig().set("count", getCount() + 1);
+
         plugin.ymlManager.saveConfig();
 
         Location origin = new Location(player.getWorld(), originX, 4, originZ);
@@ -336,9 +343,8 @@ public class cubeUtil {
         room[0] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locX") * 23) + 11.5;
         room[1] = 10;
         room[2] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locZ") * 23) + 11.5;
-        Bukkit.broadcastMessage(Arrays.toString(room));
         return room;
-    }
+    } //큐브 중심점 리턴
 
     public void resetRoom(int roomNo) {
         double[] loc = getMidPoint(roomNo);
@@ -351,7 +357,110 @@ public class cubeUtil {
             }
         }
         Bukkit.getWorld("world").spawnEntity(location, EntityType.GIANT);
-    }
+    } // 방 몹 초기화 이후 기능추가예정
+
+    public int randomEffect() {
+        Random random1 = new Random();
+        int cubeEffect = random1.nextInt(100);
+        cubeEffect += 1;
+
+        int effect;
+
+        if (cubeEffect <= 6) {
+            effect = 1;
+        }
+        else if (cubeEffect <= 12) {
+            effect = 2;
+        }
+        else if (cubeEffect <= 18) {
+            effect = 3;
+        }
+        else if (cubeEffect <= 24) {
+            effect = 4;
+        }
+        else if (cubeEffect <= 30) {
+            effect = 5;
+        }
+        else if (cubeEffect <= 36) {
+            effect = 6;
+        }
+        else if (cubeEffect <= 42) {
+            effect = 7;
+        }
+        else if (cubeEffect <= 48) {
+            effect = 8;
+        }
+        else if (cubeEffect <= 49) {
+            effect = 9;
+        }
+        else if (cubeEffect <= 50){
+            effect = 10;
+        }
+        else {
+            effect = 0;
+        }
+
+        return effect;
+    } // 랜덤한 이펙트
+
+    public void giveEffect(Player player) {
+        int effectNumber = plugin.ymlManager.getConfig().getInt("room." + getCubeNumber(getCubePos(player)) + ".effect");
+        switch (effectNumber) {
+            case 0:
+                clearEffect(player);
+                break;
+            case 1:
+                player.addPotionEffect(PotionEffectType.SLOW.createEffect(10000,10));
+                break;
+            case 2:
+                player.addPotionEffect(PotionEffectType.SLOW.createEffect(10000,5));
+                player.addPotionEffect(PotionEffectType.JUMP.createEffect(10000,5));
+                player.addPotionEffect(PotionEffectType.SLOW_FALLING.createEffect(10000,2));
+                break;
+            case 3:
+                player.addPotionEffect(PotionEffectType.POISON.createEffect(10000,3));
+                break;
+            case 4:
+                player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(10000,1));
+                break;
+            case 5:
+                player.addPotionEffect(PotionEffectType.WITHER.createEffect(10000,5));
+                break;
+            case 6:
+                player.addPotionEffect(PotionEffectType.CONFUSION.createEffect(10000,1));
+                break;
+            case 7:
+                player.setFoodLevel(0);
+                break;
+            case 8:
+                player.addPotionEffect(PotionEffectType.SLOW_DIGGING.createEffect(10000,5));
+                break;
+            case 9:
+                player.addPotionEffect(PotionEffectType.SLOW.createEffect(10000,10));
+                player.addPotionEffect(PotionEffectType.SLOW_DIGGING.createEffect(10000,5));
+                player.addPotionEffect(PotionEffectType.CONFUSION.createEffect(10000,1));
+                player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(10000,1));
+                player.setFoodLevel(0);
+                player.addPotionEffect(PotionEffectType.WEAKNESS.createEffect(10000,5));
+                break;
+            case 10:
+                player.addPotionEffect(PotionEffectType.SPEED.createEffect(10000,3));
+                player.addPotionEffect(PotionEffectType.FAST_DIGGING.createEffect(10000,2));
+                player.addPotionEffect(PotionEffectType.INCREASE_DAMAGE.createEffect(10000,5));
+                player.addPotionEffect(PotionEffectType.DAMAGE_RESISTANCE.createEffect(10000,5));
+                player.addPotionEffect(PotionEffectType.REGENERATION.createEffect(10000,5));
+                player.addPotionEffect(PotionEffectType.ABSORPTION.createEffect(10000,5));
+                player.addPotionEffect(PotionEffectType.LUCK.createEffect(10000,1));
+                break;
+        }
+    } // 이펙트 부여
+
+    public void clearEffect(Player player) {
+        for (PotionEffect e : player.getActivePotionEffects()) {
+            player.removePotionEffect(e.getType());
+        }
+        player.setFoodLevel(20);
+    } // 이펙트 클리어
 
     public void startTimer() {
         if (timer) {
@@ -362,20 +471,35 @@ public class cubeUtil {
         }
         timer = true;
         Bukkit.broadcastMessage("all task started!");
-    }
+    } // 타이머 시작
 
     public void stopTimer() {
         timer = false;
         Bukkit.getScheduler().cancelTasks(plugin);
         Bukkit.broadcastMessage("all task cleared!");
-    }
-
-    BukkitScheduler scheduler = Bukkit.getScheduler();
+        plugin.runBoard();
+        plugin.ymlManager.saveConfig();
+    } // 타이머 멈춤 (스코어보드 타이머는 재시작)
 
     public void roomTimer(int roomNo) {
-        scheduler.runTaskTimer(plugin, () -> {
-            Bukkit.broadcastMessage(ChatColor.GREEN + "tick for room " + ChatColor.GRAY + roomNo);
-            resetRoom(roomNo);
-        }, 0, 200);
-    }
+        scheduler.runTaskTimer(plugin, new Runnable() {
+            int tickLeft = plugin.ymlManager.getConfig().getInt("room." + roomNo + ".tickLeft");
+            @Override
+            public void run() {
+                if (tickLeft == 201) {
+                    resetRoom(roomNo);
+                    tickLeft--;
+                }
+                else if (tickLeft > 0) {
+                    tickLeft--;
+                }
+                else {
+                    Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "tick for room " + ChatColor.GRAY + roomNo);
+                    resetRoom(roomNo);
+                    tickLeft = 200;
+                }
+                plugin.ymlManager.getConfig().set("room." + roomNo + ".tickLeft", tickLeft);
+            }
+        }, 0, 1);
+    } // 방 타이머 (렉심함, 이후 교체예정)
 }
