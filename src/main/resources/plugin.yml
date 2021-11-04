@@ -4,3 +4,4 @@ main: org.oreoprojekt.cube.CUBE
 api-version: 1.16
 commands:
   cube:
+  spawn:
