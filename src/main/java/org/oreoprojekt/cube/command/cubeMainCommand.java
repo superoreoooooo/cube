@@ -14,12 +14,12 @@ import org.oreoprojekt.cube.util.cubeUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class cubeItemCommand implements CommandExecutor {
+public class cubeMainCommand implements CommandExecutor {
 
     public CUBE plugin;
     private cubeUtil cubeUtil;
 
-    public cubeItemCommand(CUBE plugin) {
+    public cubeMainCommand(CUBE plugin) {
         this.plugin = plugin;
         this.cubeUtil = new cubeUtil(plugin);
     }
@@ -29,17 +29,38 @@ public class cubeItemCommand implements CommandExecutor {
         if (!(sender instanceof Player)) return false;
         Player player = (Player) sender;
 
+        if (args.length == 0) {
+            player.sendMessage("/cube stop, start, reset, save, reload, item");
+        }
+
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("stop")) {
+                player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.stop"));
                 cubeUtil.stopTimer();
                 return true;
             }
             if (args[0].equalsIgnoreCase("start")) {
+                player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.start"));
                 cubeUtil.startTimer();
                 return true;
             }
+            if (args[0].equalsIgnoreCase("reset")) {
+                player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.reset"));
+                plugin.saveDefaultConfig();
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("save")) {
+                player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.save"));
+                plugin.saveConfig();
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("reload")) {
+                player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.reload"));
+                plugin.reloadConfig();
+                return true;
+            }
             if (args[0].equalsIgnoreCase("item")) {
-                player.sendMessage(ChatColor.GOLD + "아이템을 받으셨습니다.");
+                player.sendMessage(ChatColor.GOLD + plugin.getConfig().getString("message.getItem"));
                 ItemStack item1 = new ItemStack(Material.IRON_HORSE_ARMOR);
                 ItemStack item2 = new ItemStack(Material.BLAZE_ROD);
                 ItemMeta meta1 = item1.getItemMeta();

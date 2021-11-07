@@ -19,7 +19,7 @@ public class cubeUtil {
     Boolean timer = false;
     BukkitScheduler scheduler = Bukkit.getScheduler();
 
-    private final CUBE plugin;
+    private CUBE plugin;
 
     public cubeUtil(CUBE plugin) {
         this.plugin = plugin;
@@ -28,6 +28,9 @@ public class cubeUtil {
     public int getCount() {
         return plugin.ymlManager.getConfig().getInt("count");
     } // 방 개수 리턴
+
+    private final int roomSize = plugin.getConfig().getInt("system.roomSize");
+    private final double halfRoomSize = (double) roomSize / 2;
 
     public void printAllRoomLocation(Player player) {
         for (int rn = 0; rn < getCount(); rn++) {
@@ -60,7 +63,7 @@ public class cubeUtil {
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorW", true);
                     plugin.ymlManager.saveConfig();
                     Location pLoc = player.getLocation();
-                    pLoc.set((playerLoc[0] * 23 + 1.5), 7, (playerLoc[2] * 23 + 11.5));
+                    pLoc.set((playerLoc[0] * roomSize + 1.5), 7, (playerLoc[2] * roomSize + halfRoomSize));
                     block.add(1,0,0);
                     block.getBlock().setType(Material.EMERALD_BLOCK);
                     player.teleport(pLoc);
@@ -77,7 +80,7 @@ public class cubeUtil {
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorS", true);
                     plugin.ymlManager.saveConfig();
                     Location pLoc = player.getLocation();
-                    pLoc.set((playerLoc[0] * 23 + 11.5), 7, (playerLoc[2] * 23 + 21.5));
+                    pLoc.set((playerLoc[0] * roomSize + halfRoomSize), 7, (playerLoc[2] * roomSize + roomSize - 1.5));
                     block.add(0,0,-1);
                     block.getBlock().setType(Material.EMERALD_BLOCK);
                     player.teleport(pLoc);
@@ -94,7 +97,7 @@ public class cubeUtil {
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorE", true);
                     plugin.ymlManager.saveConfig();
                     Location pLoc = player.getLocation();
-                    pLoc.set((playerLoc[0] * 23 + 21.5), 7, (playerLoc[2] * 23 + 11.5));
+                    pLoc.set((playerLoc[0] * roomSize + roomSize - 1.5), 7, (playerLoc[2] * roomSize + halfRoomSize));
                     block.add(-1,0,0);
                     block.getBlock().setType(Material.EMERALD_BLOCK);
                     player.teleport(pLoc);
@@ -111,7 +114,7 @@ public class cubeUtil {
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorN", true);
                     plugin.ymlManager.saveConfig();
                     Location pLoc = player.getLocation();
-                    pLoc.set((playerLoc[0] * 23 + 11.5), 7, (playerLoc[2] * 23 + 1.5));
+                    pLoc.set((playerLoc[0] * roomSize + halfRoomSize), 7, (playerLoc[2] * roomSize + 1.5));
                     block.add(0,0,1);
                     block.getBlock().setType(Material.EMERALD_BLOCK);
                     player.teleport(pLoc);
@@ -119,7 +122,7 @@ public class cubeUtil {
                 break;
         }
         giveEffect(player);
-    } // 플레이어 이동 이후 알고리즘 수정예정
+    } // 플레이어 이동 -> 이후 알고리즘 수정예정
 
     public int[] getCubePos(Player player) {
         int[] playerPos = new int[3];
@@ -130,21 +133,21 @@ public class cubeUtil {
         playerPos[2] = (int) player.getLocation().getZ();
 
         if (playerPos[0] < 0) {
-            cubePos[0] = playerPos[0] / 23 - 1;
+            cubePos[0] = playerPos[0] / roomSize - 1;
         }
         else {
-            cubePos[0] = playerPos[0] / 23;
+            cubePos[0] = playerPos[0] / roomSize;
         }
         if (playerPos[2] < 0) {
-            cubePos[2] = playerPos[2] / 23 - 1;
+            cubePos[2] = playerPos[2] / roomSize - 1;
         }
         else {
-            cubePos[2] = playerPos[2] / 23;
+            cubePos[2] = playerPos[2] / roomSize;
         }
         cubePos[1] = playerPos[1];
 
         return cubePos;
-    } //플레이어 있는 위치를 23으로 나눈 값 리턴
+    } // 플레이어 있는 위치를 roomSize으로 나눈 값 리턴
 
     public int getCubeNumber(int[] playerLoc) {
 
@@ -163,7 +166,7 @@ public class cubeUtil {
             }
         }
         return false;
-    } //플레이어 위치에 큐브 있으면 true 없으면 false
+    } // 플레이어 위치에 큐브 있으면 true 없으면 false
 
     public void checkMain() {
         if (getCount() > 0) return;
@@ -191,9 +194,9 @@ public class cubeUtil {
         Location origin = new Location(Bukkit.getWorld("world"), originX, 4, originZ);
         Location ex = new Location(Bukkit.getWorld("world"), exX, 4, exZ);
 
-        for (int x = 0; x < 23; x++) {
-            for (int z = 0; z < 23; z++) {
-                for (int y = 0; y < 23; y++) {
+        for (int x = 0; x < roomSize; x++) {
+            for (int z = 0; z < roomSize; z++) {
+                for (int y = 0; y < roomSize; y++) {
                     origin.getBlock().setType(ex.getBlock().getType());
                     origin.set(originX + x, originY + y, originZ + z);
                     ex.set(exX + x, exY + y, exZ + z);
@@ -211,7 +214,7 @@ public class cubeUtil {
         Random random = new Random();
         int cubeType = random.nextInt(6);
         cubeType += 1;
-        int tickLeft = 201;
+        int tickLeft = 10;
 
         int exX = 10000;
         int exY = 4;
@@ -309,40 +312,28 @@ public class cubeUtil {
         Location origin = new Location(player.getWorld(), originX, 4, originZ);
         Location ex = new Location(player.getWorld(), exX, 4, exZ);
 
-        if (playerLoc[0] < 0 && playerLoc[2] < 0) {  // c1 (제 3사분면)
-            originX = (playerLoc[0] * 23);
-            originZ = (playerLoc[2] * 23);
-        }
-        else if (playerLoc[0] >= 0 && playerLoc[2] < 0) { // c2 (제 2사분면)
-            originX = (playerLoc[0] * 23);
-            originZ = (playerLoc[2] * 23);
-        }
-        else if (playerLoc[0] < 0 && playerLoc[2] >= 0) { // c3 (제 4사분면)
-            originX = (playerLoc[0] * 23);
-            originZ = (playerLoc[2] * 23);
-        }
-        else { // c4 (제 1사분면)
-            originX = (playerLoc[0] * 23);
-            originZ = (playerLoc[2] * 23);
-        }
-        for (int x = 0; x <= 22; x++) {
-            for (int z = 0; z <= 22; z++) {
-                for (int y = 0; y <=22; y++) {
+        originX = (playerLoc[0] * roomSize);
+        originZ = (playerLoc[2] * roomSize);
+
+        for (int x = 0; x < roomSize; x++) {
+            for (int z = 0; z < roomSize; z++) {
+                for (int y = 0; y < roomSize; y++) {
                     origin.getBlock().setType(ex.getBlock().getType());
                     origin.set(originX + x, originY + y, originZ + z);
                     ex.set(exX + x, exY + y, exZ + z);
                 }
             }
         }
+
         origin.getBlock().setType(Material.WHITE_CONCRETE);
         roomTimer(cnt);
     } // 큐브 생성
 
     public double[] getMidPoint(int roomNo) {
         double[] room = new double[3];
-        room[0] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locX") * 23) + 11.5;
-        room[1] = 10;
-        room[2] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locZ") * 23) + 11.5;
+        room[0] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locX") * roomSize) + halfRoomSize;
+        room[1] = 1;
+        room[2] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locZ") * roomSize) + halfRoomSize;
         return room;
     } //큐브 중심점 리턴
 
@@ -350,7 +341,7 @@ public class cubeUtil {
         double[] loc = getMidPoint(roomNo);
         Location location = new Location(Bukkit.getWorld("world"), loc[0], 7, loc[2]);
         for (Entity entity : location.getWorld().getEntities()) {
-            if (entity.getLocation().distanceSquared(location) <= 12) {
+            if (entity.getLocation().distanceSquared(location) <= halfRoomSize + 1) {
                 if (!(entity instanceof Player)) {
                     entity.remove();
                 }
@@ -456,10 +447,10 @@ public class cubeUtil {
     } // 이펙트 부여
 
     public void clearEffect(Player player) {
+        player.setFoodLevel(20);
         for (PotionEffect e : player.getActivePotionEffects()) {
             player.removePotionEffect(e.getType());
         }
-        player.setFoodLevel(20);
     } // 이펙트 클리어
 
     public void startTimer() {
@@ -470,13 +461,11 @@ public class cubeUtil {
             roomTimer(i);
         }
         timer = true;
-        Bukkit.broadcastMessage("all task started!");
     } // 타이머 시작
 
     public void stopTimer() {
         timer = false;
         Bukkit.getScheduler().cancelTasks(plugin);
-        Bukkit.broadcastMessage("all task cleared!");
         plugin.runBoard();
         plugin.ymlManager.saveConfig();
     } // 타이머 멈춤 (스코어보드 타이머는 재시작)
@@ -484,9 +473,10 @@ public class cubeUtil {
     public void roomTimer(int roomNo) {
         scheduler.runTaskTimer(plugin, new Runnable() {
             int tickLeft = plugin.ymlManager.getConfig().getInt("room." + roomNo + ".tickLeft");
+            final int resetTick = plugin.getConfig().getInt("system.resettime");
             @Override
             public void run() {
-                if (tickLeft == 201) {
+                if (tickLeft == resetTick) {
                     resetRoom(roomNo);
                     tickLeft--;
                 }
@@ -496,10 +486,10 @@ public class cubeUtil {
                 else {
                     Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "tick for room " + ChatColor.GRAY + roomNo);
                     resetRoom(roomNo);
-                    tickLeft = 200;
+                    tickLeft = resetTick;
                 }
                 plugin.ymlManager.getConfig().set("room." + roomNo + ".tickLeft", tickLeft);
             }
-        }, 0, 1);
+        }, 0, 20);
     } // 방 타이머 (렉심함, 이후 교체예정)
 }
