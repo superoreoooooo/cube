@@ -36,7 +36,7 @@ public class cubeMainCommand implements CommandExecutor {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("stop")) {
                 player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.stop"));
-                cubeUtil.stopTimer();
+                cubeUtil.restartTimer();
                 return true;
             }
             if (args[0].equalsIgnoreCase("start")) {

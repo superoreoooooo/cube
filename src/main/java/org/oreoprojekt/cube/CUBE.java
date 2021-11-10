@@ -19,7 +19,6 @@ public final class CUBE extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
         this.scoreBoard = new cubeScoreBoard(this);
         this.saveDefaultConfig();
 

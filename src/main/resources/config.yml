@@ -8,4 +8,4 @@ message:
   spawn: "스폰으로 이동하였습니다."
 system:
   resettime: 10
-  roomSize: 23
+  roomsize: 23

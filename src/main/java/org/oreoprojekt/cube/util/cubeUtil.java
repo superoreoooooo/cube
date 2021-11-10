@@ -21,15 +21,16 @@ public class cubeUtil {
 
     private CUBE plugin;
 
-    public cubeUtil(CUBE plugin) {
-        this.plugin = plugin;
+    public cubeUtil(CUBE main) {
+        this.plugin = main;
     }
 
     public int getCount() {
         return plugin.ymlManager.getConfig().getInt("count");
     } // 방 개수 리턴
 
-    private final int roomSize = plugin.getConfig().getInt("system.roomSize");
+    private final int roomSize = plugin.getConfig().getInt("system.roomsize");
+
     private final double halfRoomSize = (double) roomSize / 2;
 
     public void printAllRoomLocation(Player player) {
@@ -40,7 +41,7 @@ public class cubeUtil {
 
     public void movePlayer(Player player, boolean hasKey) {
         clearEffect(player);
-        int[] playerLoc = getCubePos(player);
+        int[] playerLoc = getCubedPosition(player);
         if (getCubeNumber(playerLoc) == -1) {
             player.sendMessage(ChatColor.RED + "ERROR_NOT_IN_ROOM");
             return;
@@ -124,7 +125,7 @@ public class cubeUtil {
         giveEffect(player);
     } // 플레이어 이동 -> 이후 알고리즘 수정예정
 
-    public int[] getCubePos(Player player) {
+    public int[] getCubedPosition(Player player) {
         int[] playerPos = new int[3];
         int[] cubePos = new int[3];
 
@@ -206,7 +207,7 @@ public class cubeUtil {
     } // 메인 큐브 생성 (0,0)
 
     public void generateCube(Player player) {
-        int[] playerLoc = getCubePos(player);
+        int[] playerLoc = getCubedPosition(player);
         int originX = 0;
         int originY = 4;
         int originZ = 0;
@@ -337,10 +338,18 @@ public class cubeUtil {
         return room;
     } //큐브 중심점 리턴
 
+    public double[] getCubePosition(int roomNo) {
+        double[] room = new double[3];
+        room[0] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locX") * roomSize);
+        room[1] = 1;
+        room[2] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locZ") * roomSize);
+        return room;
+    } //큐브 시작점 리턴
+
     public void resetRoom(int roomNo) {
         double[] loc = getMidPoint(roomNo);
         Location location = new Location(Bukkit.getWorld("world"), loc[0], 7, loc[2]);
-        for (Entity entity : location.getWorld().getEntities()) {
+        for (Entity entity : location.getWorld().getNearbyLivingEntities(location, roomSize)) {
             if (entity.getLocation().distanceSquared(location) <= halfRoomSize + 1) {
                 if (!(entity instanceof Player)) {
                     entity.remove();
@@ -395,7 +404,7 @@ public class cubeUtil {
     } // 랜덤한 이펙트
 
     public void giveEffect(Player player) {
-        int effectNumber = plugin.ymlManager.getConfig().getInt("room." + getCubeNumber(getCubePos(player)) + ".effect");
+        int effectNumber = plugin.ymlManager.getConfig().getInt("room." + getCubeNumber(getCubedPosition(player)) + ".effect");
         switch (effectNumber) {
             case 0:
                 clearEffect(player);
@@ -461,14 +470,21 @@ public class cubeUtil {
             roomTimer(i);
         }
         timer = true;
+        plugin.runBoard();
     } // 타이머 시작
 
     public void stopTimer() {
         timer = false;
         Bukkit.getScheduler().cancelTasks(plugin);
+        plugin.ymlManager.saveConfig();
+    } // 타이머 멈춤
+
+    public void restartTimer() {
+        timer = false;
+        Bukkit.getScheduler().cancelTasks(plugin);
         plugin.runBoard();
         plugin.ymlManager.saveConfig();
-    } // 타이머 멈춤 (스코어보드 타이머는 재시작)
+    } // 타이머 재시작 (스코어보드 타이머는 재시작)
 
     public void roomTimer(int roomNo) {
         scheduler.runTaskTimer(plugin, new Runnable() {

@@ -3,7 +3,6 @@ package org.oreoprojekt.cube.util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.*;
 import org.oreoprojekt.cube.CUBE;
 
@@ -28,14 +27,14 @@ public class cubeScoreBoard {
         createBoard(player);
         Score scoreName = player.getScoreboard().getObjective("Playerboard").getScore(ChatColor.WHITE + "⎮이름 : " + player.getName().toString());
         scoreName.setScore(11);
-        Score scoreLocation = player.getScoreboard().getObjective("Playerboard").getScore(ChatColor.WHITE + "⎮현재 위치 : " + cubeUtil.getCubeNumber(cubeUtil.getCubePos(player)));
+        Score scoreLocation = player.getScoreboard().getObjective("Playerboard").getScore(ChatColor.WHITE + "⎮현재 위치 : " + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)));
         scoreLocation.setScore(10);
         Score scoreEffect = player.getScoreboard().getObjective("Playerboard").getScore(ChatColor.WHITE + "⎮효과 : " + getEffect(player));
         scoreEffect.setScore(9);
     }
 
     public String getEffect(Player player) {
-        int effectNumber = plugin.ymlManager.getConfig().getInt("room." + cubeUtil.getCubeNumber(cubeUtil.getCubePos(player)) + ".effect");
+        int effectNumber = plugin.ymlManager.getConfig().getInt("room." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".effect");
         switch (effectNumber) {
             case 1:
                 return "중력";
