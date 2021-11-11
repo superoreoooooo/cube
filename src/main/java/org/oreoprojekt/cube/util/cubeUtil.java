@@ -29,9 +29,9 @@ public class cubeUtil {
         return plugin.ymlManager.getConfig().getInt("count");
     } // 방 개수 리턴
 
-    private final int roomSize = plugin.getConfig().getInt("system.roomsize");
+    private int roomSize = 23; //plugin.getConfig().getInt("system.roomsize");
 
-    private final double halfRoomSize = (double) roomSize / 2;
+    private double halfRoomSize = (double) roomSize / 2;
 
     public void printAllRoomLocation(Player player) {
         for (int rn = 0; rn < getCount(); rn++) {
@@ -349,7 +349,7 @@ public class cubeUtil {
     public void resetRoom(int roomNo) {
         double[] loc = getMidPoint(roomNo);
         Location location = new Location(Bukkit.getWorld("world"), loc[0], 7, loc[2]);
-        for (Entity entity : location.getWorld().getNearbyLivingEntities(location, roomSize)) {
+        for (Entity entity : location.getWorld().getEntities()) {
             if (entity.getLocation().distanceSquared(location) <= halfRoomSize + 1) {
                 if (!(entity instanceof Player)) {
                     entity.remove();
@@ -489,7 +489,7 @@ public class cubeUtil {
     public void roomTimer(int roomNo) {
         scheduler.runTaskTimer(plugin, new Runnable() {
             int tickLeft = plugin.ymlManager.getConfig().getInt("room." + roomNo + ".tickLeft");
-            final int resetTick = plugin.getConfig().getInt("system.resettime");
+            final int resetTick = 10;//plugin.getConfig().getInt("system.resettime");
             @Override
             public void run() {
                 if (tickLeft == resetTick) {
@@ -501,7 +501,6 @@ public class cubeUtil {
                 }
                 else {
                     Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "tick for room " + ChatColor.GRAY + roomNo);
-                    resetRoom(roomNo);
                     tickLeft = resetTick;
                 }
                 plugin.ymlManager.getConfig().set("room." + roomNo + ".tickLeft", tickLeft);
