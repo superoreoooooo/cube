@@ -21,7 +21,6 @@ public final class CUBE extends JavaPlugin {
     public void onEnable() {
         this.scoreBoard = new cubeScoreBoard(this);
         this.saveDefaultConfig();
-        Bukkit.getConsoleSender().sendMessage(String.valueOf(this.getConfig().getInt("system.roomsize")));
 
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "CUBE ON");
         getServer().getPluginManager().registerEvents(new cubeListener(this), this);
@@ -34,7 +33,7 @@ public final class CUBE extends JavaPlugin {
 
         cubeUtil.checkMain();
 
-        cubeUtil.startTimer();
+        //cubeUtil.startTimer();
 
         runBoard();
     }

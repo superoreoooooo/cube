@@ -29,9 +29,9 @@ public class cubeUtil {
         return plugin.ymlManager.getConfig().getInt("count");
     } // 방 개수 리턴
 
-    private int roomSize = 23; //plugin.getConfig().getInt("system.roomsize");
+    int roomSize = 23; //plugin.getConfig().getRoomS("system.roomsize");
 
-    private double halfRoomSize = (double) roomSize / 2;
+    double halfRoomSize = (double) roomSize / 2;
 
     public void printAllRoomLocation(Player player) {
         for (int rn = 0; rn < getCount(); rn++) {
@@ -489,7 +489,7 @@ public class cubeUtil {
     public void roomTimer(int roomNo) {
         scheduler.runTaskTimer(plugin, new Runnable() {
             int tickLeft = plugin.ymlManager.getConfig().getInt("room." + roomNo + ".tickLeft");
-            final int resetTick = 10;//plugin.getConfig().getInt("system.resettime");
+            final int resetTick = 10;//plugin.getConfig().getRoomS("system.resettime");
             @Override
             public void run() {
                 if (tickLeft == resetTick) {
@@ -507,4 +507,5 @@ public class cubeUtil {
             }
         }, 0, 20);
     } // 방 타이머 (렉심함, 이후 교체예정)
+
 }

@@ -6,6 +6,3 @@ message:
   save: "Config saved!"
   getItem: "아이템을 지급하였습니다."
   spawn: "스폰으로 이동하였습니다."
-system:
-  resettime: 10
-  roomsize: 23
