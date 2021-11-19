@@ -348,9 +348,10 @@ public class cubeUtil {
 
     public void resetRoom(int roomNo) {
         double[] loc = getMidPoint(roomNo);
+        double[] cubePos = getCubePosition(roomNo);
         Location location = new Location(Bukkit.getWorld("world"), loc[0], 7, loc[2]);
         for (Entity entity : location.getWorld().getEntities()) {
-            if (entity.getLocation().distanceSquared(location) <= halfRoomSize + 1) {
+            if (entity.getLocation().getX() > cubePos[0] && entity.getLocation().getX() < cubePos[0] + 23 && entity.getLocation().getZ() > cubePos[2] && entity.getLocation().getZ() < cubePos[2] + 23) {
                 if (!(entity instanceof Player)) {
                     entity.remove();
                 }
@@ -358,6 +359,32 @@ public class cubeUtil {
         }
         Bukkit.getWorld("world").spawnEntity(location, EntityType.GIANT);
     } // 방 몹 초기화 이후 기능추가예정
+
+    public int randomType() {
+        Random random1 = new Random();
+        int cubeType = random1.nextInt(1000);
+        cubeType += 1;
+
+        int type;
+
+        if (cubeType <= 1) {
+            type = 1; // up
+        }
+        else if (cubeType <= 9) {
+            type = 2; // boss
+        }
+        else if (cubeType <= 100) {
+            type = 3; // item
+        }
+        else if (cubeType <= 200) {
+            type = 4; // normal
+        }
+        else {
+            type = 0; // enemy
+        }
+
+        return type;
+    } // 랜덤한 이펙트
 
     public int randomEffect() {
         Random random1 = new Random();
