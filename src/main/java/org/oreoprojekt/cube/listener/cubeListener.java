@@ -27,17 +27,13 @@ public class cubeListener implements Listener {
                 cubeUtil.printAllRoomLocation(player);
             }
         }
-        if (player.getTargetBlock(3).getType().equals(Material.REDSTONE_BLOCK)) {
+        if (player.getTargetBlock(3).getType().equals(Material.CRYING_OBSIDIAN) ||
+                player.getTargetBlock(3).getType().equals(Material.OBSIDIAN) ||
+                player.getTargetBlock(3).getType().equals(Material.COAL_BLOCK) ||
+                player.getTargetBlock(3).getType().equals(Material.BLACKSTONE)) {
             if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                 if (player.getItemInHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
-                    cubeUtil.movePlayer(player, false);
-                }
-            }
-        }
-        if (player.getTargetBlock(3).getType().equals(Material.EMERALD_BLOCK)) {
-            if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                if (player.getItemInHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
-                    cubeUtil.movePlayer(player, true);
+                    cubeUtil.movePlayer(player);
                 }
             }
         }
