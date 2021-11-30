@@ -29,9 +29,9 @@ public class cubeUtil {
         return plugin.ymlManager.getConfig().getInt("count");
     } // 방 개수 리턴
 
-    int roomSize = 29;
+    public int roomSize = 29;
 
-    double halfRoomSize = (double) roomSize / 2;
+    public double halfRoomSize = (double) roomSize / 2;
 
     public void printAllRoomLocation(Player player) {
         for (int rn = 0; rn < getCount(); rn++) {
@@ -43,15 +43,15 @@ public class cubeUtil {
         String s = "null";
         switch (player.getTargetBlock(3).getType().name()) {
             case "CRYING_OBSIDIAN": //East
-                s = "EAST";
+                s = "DIAMOND_BLOCK";
                 break;
-            case "OBSIDIAN":        //North
+            case "EMERALD_BLOCK":        //North
                 s = "NORTH";
                 break;
-            case "COAL_BLOCK":      //West
+            case "GOLD_BLOCK":      //West
                 s = "WEST";
                 break;
-            case "BLACKSTONE":      //South
+            case "NETHERITE_BLOCK":      //South
                 s = "SOUTH";
                 break;
         }
@@ -124,8 +124,8 @@ public class cubeUtil {
         switch (s) {
             case "EAST": // 동쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorE")) {
-                    player.getTargetBlock(3).getLocation().add(-2,-2,0).getBlock().setType(Material.EMERALD_BLOCK);
-                    player.getTargetBlock(3).getLocation().add(3,-2,0).getBlock().setType(Material.EMERALD_BLOCK);
+                    player.getTargetBlock(3).getLocation().add(-2,-2,0).getBlock().setType(Material.LIME_CONCRETE);
+                    player.getTargetBlock(3).getLocation().add(3,-2,0).getBlock().setType(Material.LIME_CONCRETE);
                     playerLoc[0] = playerLoc[0] + 1; // 보고있는 방향의 방 위치값을 얻음
                     if (getCubeNumber(playerLoc) == -1) {
                         player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
@@ -141,8 +141,8 @@ public class cubeUtil {
                 break;
             case "NORTH": // 북쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorN")) {
-                    player.getTargetBlock(3).getLocation().add(0,-2,2).getBlock().setType(Material.EMERALD_BLOCK);
-                    player.getTargetBlock(3).getLocation().add(0,-2,-3).getBlock().setType(Material.EMERALD_BLOCK);
+                    player.getTargetBlock(3).getLocation().add(0,-2,2).getBlock().setType(Material.LIME_CONCRETE);
+                    player.getTargetBlock(3).getLocation().add(0,-2,-3).getBlock().setType(Material.LIME_CONCRETE);
                     playerLoc[2] = playerLoc[2] - 1; // 보고있는 방향의 방 위치값을 얻음
                     if (getCubeNumber(playerLoc) == -1) {
                         player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
@@ -158,8 +158,8 @@ public class cubeUtil {
                 break;
             case "WEST": // 서쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorW")) {
-                    player.getTargetBlock(3).getLocation().add(2,-2,0).getBlock().setType(Material.EMERALD_BLOCK);
-                    player.getTargetBlock(3).getLocation().add(-3,-2,0).getBlock().setType(Material.EMERALD_BLOCK);
+                    player.getTargetBlock(3).getLocation().add(2,-2,0).getBlock().setType(Material.LIME_CONCRETE);
+                    player.getTargetBlock(3).getLocation().add(-3,-2,0).getBlock().setType(Material.LIME_CONCRETE);
                     playerLoc[0] = playerLoc[0] - 1; // 보고있는 방향의 방 위치값을 얻음
                     if (getCubeNumber(playerLoc) == -1) {
                         player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
@@ -175,8 +175,8 @@ public class cubeUtil {
                 break;
             case "SOUTH": // 동쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorS")) {
-                    player.getTargetBlock(3).getLocation().add(0,-2,-2).getBlock().setType(Material.EMERALD_BLOCK);
-                    player.getTargetBlock(3).getLocation().add(0,-2,3).getBlock().setType(Material.EMERALD_BLOCK);
+                    player.getTargetBlock(3).getLocation().add(0,-2,-2).getBlock().setType(Material.LIME_CONCRETE);
+                    player.getTargetBlock(3).getLocation().add(0,-2,3).getBlock().setType(Material.LIME_CONCRETE);
                     playerLoc[2] = playerLoc[2] + 1; // 보고있는 방향의 방 위치값을 얻음
                     if (getCubeNumber(playerLoc) == -1) {
                         player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");

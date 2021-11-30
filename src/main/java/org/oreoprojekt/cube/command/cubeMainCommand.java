@@ -1,11 +1,15 @@
 package org.oreoprojekt.cube.command;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.oreoprojekt.cube.CUBE;
@@ -13,9 +17,9 @@ import org.oreoprojekt.cube.util.cubeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class cubeMainCommand implements CommandExecutor {
-
     public CUBE plugin;
     private cubeUtil cubeUtil;
 
@@ -57,6 +61,16 @@ public class cubeMainCommand implements CommandExecutor {
             if (args[0].equalsIgnoreCase("reload")) {
                 player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.reload"));
                 plugin.reloadConfig();
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("test")) {
+                BlockData data = Material.EMERALD_BLOCK.createBlockData();
+                for (int i = 0; i < 10; i++) {
+                    FallingBlock fb = player.getWorld().spawnFallingBlock(player.getEyeLocation(), data);
+                    fb.setDropItem(false);
+                    fb.setCustomName("ㅎㅇ");
+                    fb.setCustomNameVisible(true);
+                }
                 return true;
             }
             if (args[0].equalsIgnoreCase("item")) {
