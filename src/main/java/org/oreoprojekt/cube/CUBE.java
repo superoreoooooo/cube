@@ -13,6 +13,9 @@ import org.oreoprojekt.cube.util.cubeUtil;
 
 public final class CUBE extends JavaPlugin {
 
+    /** 2021 12 23 봉인  **/
+    // 미래에 정현종이 말하면 다시 재시작?
+
     public cubeYmlManager ymlManager;
     private cubeUtil cubeUtil;
     private cubeScoreBoard scoreBoard;
