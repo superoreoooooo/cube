@@ -24,7 +24,7 @@ public class cubeSpawnCommand implements CommandExecutor {
         }
         Player player = (Player) sender;
         player.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("message.spawn"));
-        Location spawn = new Location(player.getWorld(),cubeUtil.halfRoomSize ,7 ,cubeUtil.halfRoomSize);
+        Location spawn = new Location(player.getWorld(),cubeUtil.halfRoomSize ,3.5 ,cubeUtil.halfRoomSize);
         cubeUtil.clearEffect(player);
         player.teleport(spawn);
         return false;

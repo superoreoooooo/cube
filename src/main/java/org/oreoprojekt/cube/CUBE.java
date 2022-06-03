@@ -8,15 +8,16 @@ import org.oreoprojekt.cube.command.cubeMainCommand;
 import org.oreoprojekt.cube.command.cubeSpawnCommand;
 import org.oreoprojekt.cube.listener.cubeListener;
 import org.oreoprojekt.cube.manager.cubeYmlManager;
+import org.oreoprojekt.cube.manager.pDataYmlManager;
 import org.oreoprojekt.cube.util.cubeScoreBoard;
 import org.oreoprojekt.cube.util.cubeUtil;
 
 public final class CUBE extends JavaPlugin {
 
-    /** 2021 12 23 봉인  **/
-    // 미래에 정현종이 말하면 다시 재시작?
+    // 2022 01 25 봉인해제
 
     public cubeYmlManager ymlManager;
+    public pDataYmlManager pDataYmlManager;
     private cubeUtil cubeUtil;
     private cubeScoreBoard scoreBoard;
 
@@ -32,6 +33,7 @@ public final class CUBE extends JavaPlugin {
         getCommand("spawn").setExecutor(new cubeSpawnCommand(this));
 
         this.ymlManager = new cubeYmlManager(this);
+        this.pDataYmlManager = new pDataYmlManager(this);
         this.cubeUtil = new cubeUtil(this);
 
         cubeUtil.checkMain();
