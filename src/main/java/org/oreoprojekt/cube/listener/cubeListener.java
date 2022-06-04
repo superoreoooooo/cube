@@ -8,9 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.oreoprojekt.cube.CUBE;
@@ -43,7 +41,7 @@ public class cubeListener implements Listener {
             if (player.getItemInHand().getType().equals(Material.BLAZE_ROD)) {
                 e.setCancelled(true);
                 //cubeUtil.printAllRoomLocation(player);
-                player.sendMessage("cnt : " + cubeUtil.OpenCheckerList.size());
+                player.sendMessage("cnt : " + cubeUtil.countCheckers());
             }
         }
         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
@@ -60,8 +58,8 @@ public class cubeListener implements Listener {
                         }
                         cooldown.add(player);
                         itemDelay(player);
-                        cubeUtil.movePlayer(player);
                         player.setCooldown(player.getItemInHand().getType(), 20);
+                        cubeUtil.movePlayer(player);
                         break;
                     default:
                         player.sendMessage("카드를 들고 눌러주세요.");
@@ -76,6 +74,7 @@ public class cubeListener implements Listener {
         cubeUtil.restartTimer();
         pDataYmlManager.getConfig().set(e.getPlayer().getName() + ".pass", 5);
         pDataYmlManager.saveConfig();
+        cubeUtil.checkerTimer(e.getPlayer());
     }
 
     @EventHandler
@@ -84,6 +83,16 @@ public class cubeListener implements Listener {
             e.getPlayer().sendMessage("때리지 마세요!");
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        cubeUtil.checkerTimer(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        cubeUtil.checkerTimerList.remove(e.getPlayer());
     }
 
     public void itemDelay(Player player) {
