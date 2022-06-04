@@ -1,20 +1,34 @@
 package org.oreoprojekt.cube.listener;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.oreoprojekt.cube.CUBE;
 import org.oreoprojekt.cube.manager.pDataYmlManager;
 import org.oreoprojekt.cube.util.cubeUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class cubeListener implements Listener {
     private CUBE plugin;
     private cubeUtil cubeUtil;
     private pDataYmlManager pDataYmlManager;
+    private boolean timer = false;
+
+    BukkitScheduler scheduler = Bukkit.getScheduler();
+    List<Player> cooldown = new ArrayList<>();
+
 
     public cubeListener(CUBE plugin) {
         this.plugin = plugin;
@@ -28,19 +42,30 @@ public class cubeListener implements Listener {
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
             if (player.getItemInHand().getType().equals(Material.BLAZE_ROD)) {
                 e.setCancelled(true);
-                cubeUtil.printAllRoomLocation(player);
+                //cubeUtil.printAllRoomLocation(player);
+                player.sendMessage("cnt : " + cubeUtil.OpenCheckerList.size());
             }
         }
-        if (player.getTargetBlock(3).getType().equals(Material.DIAMOND_BLOCK) ||
-                player.getTargetBlock(3).getType().equals(Material.EMERALD_BLOCK) ||
-                player.getTargetBlock(3).getType().equals(Material.GOLD_BLOCK) ||
-                player.getTargetBlock(3).getType().equals(Material.NETHERITE_BLOCK)) {
-            if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                if (player.getItemInHand().getType().equals(Material.IRON_HORSE_ARMOR)) {
-                    cubeUtil.movePlayer(player, "normal");
+        if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            if (player.getTargetBlock(3).getType().equals(Material.DIAMOND_BLOCK) || player.getTargetBlock(3).getType().equals(Material.EMERALD_BLOCK) || player.getTargetBlock(3).getType().equals(Material.GOLD_BLOCK) || player.getTargetBlock(3).getType().equals(Material.NETHERITE_BLOCK)) {
+                if (player.getItemInHand().getItemMeta() == null) {
+                    player.sendMessage("카드를 들고 눌러주세요.");
+                    return;
                 }
-                else if (player.getItemInHand().getType().equals(Material.DIAMOND_HORSE_ARMOR)) {
-                    cubeUtil.movePlayer(player, "master");
+                switch (player.getItemInHand().getItemMeta().getDisplayName()) {
+                    case "mastercard" :
+                    case "checkcard" :
+                        if (cooldown.contains(player)) {
+                            return;
+                        }
+                        cooldown.add(player);
+                        itemDelay(player);
+                        cubeUtil.movePlayer(player);
+                        player.setCooldown(player.getItemInHand().getType(), 20);
+                        break;
+                    default:
+                        player.sendMessage("카드를 들고 눌러주세요.");
+                        break;
                 }
             }
         }
@@ -51,5 +76,17 @@ public class cubeListener implements Listener {
         cubeUtil.restartTimer();
         pDataYmlManager.getConfig().set(e.getPlayer().getName() + ".pass", 5);
         pDataYmlManager.saveConfig();
+    }
+
+    @EventHandler
+    public void manipulateChecker(PlayerArmorStandManipulateEvent e) {
+        if (!e.getRightClicked().isVisible()) {
+            e.getPlayer().sendMessage("때리지 마세요!");
+            e.setCancelled(true);
+        }
+    }
+
+    public void itemDelay(Player player) {
+        scheduler.runTaskLaterAsynchronously(plugin, () -> cooldown.remove(player), 20); // 쿨 1초
     }
 }
