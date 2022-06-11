@@ -80,7 +80,7 @@ public class cubeMainCommand implements CommandExecutor {
                 lore1.add("우클릭 : 현재 보고 있는 문을 열음(시도)");
                 lore2.add("우클릭 : 생성된 모든 방과 위치 확인");
                 lore3.add("마스터카드 파시블?");
-                meta1.setDisplayName("checkccard");
+                meta1.setDisplayName("checkcard");
                 meta2.setDisplayName("CUBE_CHECKER");
                 meta3.setDisplayName("mastercard");
                 meta1.setLore(lore1);
