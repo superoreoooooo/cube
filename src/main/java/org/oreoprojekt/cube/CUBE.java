@@ -38,6 +38,8 @@ public final class CUBE extends JavaPlugin {
 
         cubeUtil.checkMain();
 
+        cubeUtil.checkerTimer();
+
         //cubeUtil.startTimer();
 
         runBoard();

@@ -74,7 +74,6 @@ public class cubeListener implements Listener {
         cubeUtil.restartTimer();
         pDataYmlManager.getConfig().set(e.getPlayer().getName() + ".pass", 5);
         pDataYmlManager.saveConfig();
-        cubeUtil.checkerTimer(e.getPlayer());
     }
 
     @EventHandler
@@ -87,12 +86,10 @@ public class cubeListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        cubeUtil.checkerTimer(e.getPlayer());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        cubeUtil.checkerTimerList.remove(e.getPlayer());
     }
 
     public void itemDelay(Player player) {
