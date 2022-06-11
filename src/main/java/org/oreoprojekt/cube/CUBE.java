@@ -11,6 +11,7 @@ import org.oreoprojekt.cube.manager.cubeYmlManager;
 import org.oreoprojekt.cube.manager.pDataYmlManager;
 import org.oreoprojekt.cube.util.cubeScoreBoard;
 import org.oreoprojekt.cube.util.cubeUtil;
+import org.oreoprojekt.cube.util.utils.cubeUtil_Checker;
 
 public final class CUBE extends JavaPlugin {
 
@@ -20,6 +21,7 @@ public final class CUBE extends JavaPlugin {
     public pDataYmlManager pDataYmlManager;
     private cubeUtil cubeUtil;
     private cubeScoreBoard scoreBoard;
+    private cubeUtil_Checker Util_Checker;
 
     @Override
     public void onEnable() {
@@ -35,10 +37,11 @@ public final class CUBE extends JavaPlugin {
         this.ymlManager = new cubeYmlManager(this);
         this.pDataYmlManager = new pDataYmlManager(this);
         this.cubeUtil = new cubeUtil(this);
+        this.Util_Checker = new cubeUtil_Checker(this);
 
         cubeUtil.checkMain();
 
-        cubeUtil.checkerTimer();
+        Util_Checker.checkerTimer();
 
         //cubeUtil.startTimer();
 
