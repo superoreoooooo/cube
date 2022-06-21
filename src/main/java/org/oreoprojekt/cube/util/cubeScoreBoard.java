@@ -33,6 +33,8 @@ public class cubeScoreBoard {
         scoreEffect.setScore(9);
         Score scorePass = player.getScoreboard().getObjective("Playerboard").getScore(ChatColor.WHITE + "⎮패스 : " + plugin.pDataYmlManager.getConfig().getInt(player.getName() + ".pass"));
         scorePass.setScore(8);
+        Score scoreType = player.getScoreboard().getObjective("Playerboard").getScore(ChatColor.WHITE + "⎮타입 : " + getType(player));
+        scoreType.setScore(7);
     }
 
     public String getEffect(Player player) {
@@ -57,7 +59,19 @@ public class cubeScoreBoard {
             case 9:
                 return "일반";
             default:
-                return "미정";
+                return "error";
+        }
+    }
+
+    public String getType(Player player) {
+        int typeNum = plugin.ymlManager.getConfig().getInt("room." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".type");
+        switch (typeNum) {
+            case 0:
+                return "일반";
+            case 1:
+                return "보스";
+            default:
+                return "error";
         }
     }
 

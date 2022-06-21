@@ -11,10 +11,15 @@ public class cubeInitial {
         effectList[7] = 10;     //8 Fortune
         effectList[8] = 500;    //9 Normal
 
+        /*
         roomType[0] = 1;         //up
         roomType[1] = 9;         //boss
         roomType[2] = 90;        //Item(trap)
         roomType[3] = 100;       //Normal
         roomType[4] = 800;       //Enemy
+         */
+
+        roomType[0] = 990;      //normal
+        roomType[1] = 10;      //boss
     }
 }

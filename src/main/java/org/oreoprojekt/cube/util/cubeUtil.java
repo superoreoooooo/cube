@@ -5,30 +5,27 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Door;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.oreoprojekt.cube.CUBE;
 import org.oreoprojekt.cube.system.cubeInitial;
 
-import java.nio.file.OpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public class cubeUtil {
-
-    Boolean timer = false;
-    BukkitScheduler scheduler = Bukkit.getScheduler();
-
     private CUBE plugin;
+
+    public static HashMap<UUID, Integer> OpenCheckerList = new HashMap<>(); //체커 / 방번호
+    public static HashMap<UUID, Integer> ClosedCheckerList = new HashMap<>(); //체커 / 방번호
+    public List<Player> checkerTimerList = new ArrayList<>();
+    public static int roomSize = 29;
+    public static double halfRoomSize = (double) roomSize / 2;
+    Boolean timer = false;
 
     public cubeUtil(CUBE main) {
         this.plugin = main;
@@ -37,10 +34,6 @@ public class cubeUtil {
     public int getCount() {
         return plugin.ymlManager.getConfig().getInt("count");
     } // 방 개수 리턴
-
-    public static int roomSize = 29;
-
-    public static double halfRoomSize = (double) roomSize / 2;
 
     public void printAllRoom(Player player) {
         for (int rn = 0; rn < getCount(); rn++) {
@@ -100,10 +93,6 @@ public class cubeUtil {
 
     public static final World world = Bukkit.getWorld("world");
 
-    public static HashMap<UUID, Integer> OpenCheckerList = new HashMap<>(); //체커 / 방번호
-    public static HashMap<UUID, Integer> ClosedCheckerList = new HashMap<>(); //체커 / 방번호
-    //public List<Player> checkerTimerList = new ArrayList<>();
-
     public void movePlayer(Player player) {
 
         int[] playerLoc = getCubedPosition(player);
@@ -113,6 +102,7 @@ public class cubeUtil {
             player.sendMessage(ChatColor.RED + "ERROR_NOT_IN_ROOM");
             return;
         }
+
         Location targetBlock = player.getTargetBlock(3).getLocation();
 
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
@@ -476,19 +466,9 @@ public class cubeUtil {
                 player.addPotionEffect(PotionEffectType.JUMP.createEffect(10000,5));
                 player.addPotionEffect(PotionEffectType.SLOW_FALLING.createEffect(10000,2));
                 break;
-                /**
-            case 3:
-                player.addPotionEffect(PotionEffectType.POISON.createEffect(10000,3));
-                break;
-                 **/
             case 2:
                 player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(10000,1));
                 break;
-                /**
-            case 5:
-                player.addPotionEffect(PotionEffectType.WITHER.createEffect(10000,5));
-                break;
-                 **/
             case 3:
                 player.addPotionEffect(PotionEffectType.CONFUSION.createEffect(10000,1));
                 break;
@@ -532,10 +512,6 @@ public class cubeUtil {
         if (timer) {
             return;
         }
-        /**
-        for (int i = 1; i < getCount(); i++) {
-            roomTimer(i);
-        }**/
         timer = true;
         plugin.runBoard();
     } // 타이머 시작
@@ -553,28 +529,13 @@ public class cubeUtil {
         plugin.ymlManager.saveConfig();
     } // 타이머 재시작 (스코어보드 타이머는 재시작)
 
-    /**
-    public void roomTimer(int roomNo) {
-        scheduler.runTaskTimer(plugin, new Runnable() {
-            int tickLeft = plugin.ymlManager.getConfig().getInt("room." + roomNo + ".tickLeft");
-            final int resetTick = 10; //plugin.getConfig().getRoomS("system.resettime");
-            //@Override
-            public void run() {
-                if (tickLeft == resetTick) {
-                    resetRoom(roomNo);
-                    tickLeft--;
-                }
-                else if (tickLeft > 0) {
-                    tickLeft--;
-                }
-                else {
-                    Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Ticked Room : " + ChatColor.GRAY + roomNo);
-                    tickLeft = resetTick;
-                }
-                plugin.ymlManager.getConfig().set("room." + roomNo + ".tickLeft", tickLeft);
-            }
-        }, 0, 20);
-    } // 방 타이머 (렉심함, 이후 교체예정) //제거 **/
+    public void summonBoss() {
+
+    }
+
+    public void summonMobs() {
+
+    }
 
     private void setDoor(int xWorld, int yWorld, int zWorld, Material eDoorType, BlockFace eFace) { //안씀
         Block bottom = Bukkit.getWorld("world").getBlockAt(xWorld, yWorld, zWorld);

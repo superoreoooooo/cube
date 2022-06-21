@@ -26,9 +26,8 @@ public class cubeUtil_Checker {
 
     public int checkerTask;
 
-
-
     public void checkerTimer() {
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "checker Started!");
         checkerTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             @Override
             public void run() {
@@ -114,6 +113,7 @@ public class cubeUtil_Checker {
         }
     }
 
+    @Deprecated
     public void killChecker(Player player) {
         int cnt = 0;
         int[] playerLoc = util.getCubedPosition(player);
@@ -174,10 +174,12 @@ public class cubeUtil_Checker {
         Bukkit.getConsoleSender().sendMessage("Killed " + cnt + " checkers!");
     } //사용안됨
 
+    @Deprecated
     public void spawnMainChecker() {
         //spawnOpenChecker();
     } //사용안됨
 
+    @Deprecated
     public void spawnChecker(Player player) {
         int[] playerLoc = util.getCubedPosition(player);
         Location[] locations = new Location[4];
@@ -241,6 +243,7 @@ public class cubeUtil_Checker {
         cubeUtil.ClosedCheckerList.put(checkerClosed.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
     }
 
+    @Deprecated
     public void countChecker(Player player) {
         if (cubeUtil.OpenCheckerList.size() == 0 && cubeUtil.ClosedCheckerList.size() == 0) {
             player.sendMessage("NULL");

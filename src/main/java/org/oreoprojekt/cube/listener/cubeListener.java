@@ -48,10 +48,11 @@ public class cubeListener implements Listener {
                 player.sendMessage("cnt : " + Util_Checker.countCheckers());
             }
         }
-        if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+        if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
             if (player.getTargetBlock(3).getType().equals(Material.DIAMOND_BLOCK) || player.getTargetBlock(3).getType().equals(Material.EMERALD_BLOCK) || player.getTargetBlock(3).getType().equals(Material.GOLD_BLOCK) || player.getTargetBlock(3).getType().equals(Material.NETHERITE_BLOCK)) {
                 if (player.getItemInHand().getItemMeta() == null) {
                     player.sendMessage("카드를 들고 눌러주세요.");
+                    e.setCancelled(true);
                     return;
                 }
                 switch (player.getItemInHand().getItemMeta().getDisplayName()) {
@@ -68,6 +69,7 @@ public class cubeListener implements Listener {
                         break;
                     default:
                         player.sendMessage("카드를 들고 눌러주세요.");
+                        e.setCancelled(true);
                         break;
                 }
             }
