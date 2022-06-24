@@ -19,7 +19,7 @@ import java.util.List;
 
 public class cubeMainCommand implements CommandExecutor {
     public CUBE plugin;
-    private cubeUtil cubeUtil;
+    private final cubeUtil cubeUtil;
 
     public cubeMainCommand(CUBE plugin) {
         this.plugin = plugin;
@@ -32,7 +32,7 @@ public class cubeMainCommand implements CommandExecutor {
         Player player = (Player) sender;
 
         if (args.length == 0) {
-            player.sendMessage("/cube stop, start, reset, save, reload, item");
+            player.sendMessage("/cube stop, start, reset, save, reload, item, charge");
         }
 
         if (args.length == 1) {
@@ -74,9 +74,9 @@ public class cubeMainCommand implements CommandExecutor {
                 ItemMeta meta1 = item1.getItemMeta();
                 ItemMeta meta2 = item2.getItemMeta();
                 ItemMeta meta3 = item3.getItemMeta();
-                List<String> lore1 = new ArrayList<String>();
-                List<String> lore2 = new ArrayList<String>();
-                List<String> lore3 = new ArrayList<String>();
+                List<String> lore1 = new ArrayList<>();
+                List<String> lore2 = new ArrayList<>();
+                List<String> lore3 = new ArrayList<>();
                 lore1.add("우클릭 : 현재 보고 있는 문을 열음(시도)");
                 lore2.add("우클릭 : 생성된 모든 방과 위치 확인");
                 lore3.add("마스터카드 파시블?");

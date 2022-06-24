@@ -1,30 +1,27 @@
 package org.oreoprojekt.cube.util;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Bisected;
-import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.oreoprojekt.cube.CUBE;
+import org.oreoprojekt.cube.enums.Facing;
 import org.oreoprojekt.cube.system.cubeInitial;
+import org.oreoprojekt.cube.util.utils.util_Randomizer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public class cubeUtil {
-    private CUBE plugin;
+    private final CUBE plugin;
 
     public static HashMap<UUID, Integer> OpenCheckerList = new HashMap<>(); //체커 / 방번호
     public static HashMap<UUID, Integer> ClosedCheckerList = new HashMap<>(); //체커 / 방번호
-    public List<Player> checkerTimerList = new ArrayList<>();
     public static int roomSize = 29;
     public static double halfRoomSize = (double) roomSize / 2;
+    public static final World world = Bukkit.getWorld("world");
+
     Boolean timer = false;
 
     public cubeUtil(CUBE main) {
@@ -41,47 +38,42 @@ public class cubeUtil {
         }
     } // 모든 방 리스트 출력
 
-    public String getPlayerFacing(Player player) {
-        String s = "null";
-        switch (player.getTargetBlock(3).getType().name()) {
-            case "DIAMOND_BLOCK": //East
-                s = "EAST";
-                break;
-            case "EMERALD_BLOCK": //North
-                s = "NORTH";
-                break;
-            case "GOLD_BLOCK": //West
-                s = "WEST";
-                break;
-            case "NETHERITE_BLOCK": //South
-                s = "SOUTH";
-                break;
+    public Facing getPlayerFacing(Player player) {
+        switch (player.getTargetBlock(3).getType()) {
+            case DIAMOND_BLOCK: //East
+                return Facing.EAST;
+            case EMERALD_BLOCK: //North
+                return Facing.NORTH;
+            case GOLD_BLOCK: //West
+                return Facing.WEST;
+            case NETHERITE_BLOCK: //South
+                return Facing.SOUTH;
         }
-        return s;
+        return Facing.ERROR;
     }
 
-    public boolean checkKey(Player player, String facing) { //true : 열린문 false : 닫힌문
+    public boolean checkKey(Player player, Facing facing) { //true : 열린문 false : 닫힌문
         int[] playerLoc = getCubedPosition(player);
         switch (facing) {
-            case "EAST": // 동쪽
+            case EAST: // 동쪽
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorE")) {
                     playerLoc[0] = playerLoc[0] + 1; // 보고있는 방향의 방 위치값을 얻음
                     return getCubeNumber(playerLoc) != -1; // error
                 }
                 break;
-            case "NORTH": // 북쪽
+            case NORTH: // 북쪽
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorN")) {
                     playerLoc[2] = playerLoc[2] - 1; // 보고있는 방향의 방 위치값을 얻음
                     return getCubeNumber(playerLoc) != -1; // error
                 }
                 break;
-            case "WEST": // 서쪽
+            case SOUTH: // 서쪽
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorW")) {
                     playerLoc[0] = playerLoc[0] - 1; // 보고있는 방향의 방 위치값을 얻음
                     return getCubeNumber(playerLoc) != -1; // error
                 }
                 break;
-            case "SOUTH": // 동쪽
+            case WEST: // 동쪽
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorS")) {
                     playerLoc[2] = playerLoc[2] + 1; // 보고있는 방향의 방 위치값을 얻음
                     return getCubeNumber(playerLoc) != -1; // error
@@ -91,121 +83,109 @@ public class cubeUtil {
         return false;
     }
 
-    public static final World world = Bukkit.getWorld("world");
+    public boolean checkPass(Player player) {
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        if (itemInHand.getItemMeta().getDisplayName().equals("mastercard") || itemInHand.getItemMeta().getDisplayName().equals("checkcard")) {
+            if (checkKey(player, getPlayerFacing(player))) {
+                player.sendMessage("문이 열려 있습니다. 들어갑니다.");
+                return true;
+            } else {
+                player.sendMessage("문이 잠겨 있습니다.");
+                if (itemInHand.getItemMeta().getDisplayName().equals("mastercard")) {
+                    player.sendMessage("마스터 키카드로 문을 열고 들어갑니다.");
+                    return true;
+                }
+                else {
+                    if (plugin.pDataYmlManager.getConfig().getInt(player.getName() + ".pass") <= 0) {
+                        player.sendMessage("패스를 충전하세요.");
+                        return false;
+                    }
+                    else {
+                        player.sendMessage("패스를 사용하여 문을 엽니다.");
+                        plugin.pDataYmlManager.getConfig().set(player.getName() + ".pass", plugin.pDataYmlManager.getConfig().getInt(player.getName() + ".pass") - 1);
+                        plugin.pDataYmlManager.saveConfig();
+                        return true;
+                    }
+                }
+            }
+        }
+
+        else return false;
+    }
 
     public void movePlayer(Player player) {
 
         int[] playerLoc = getCubedPosition(player);
-        String s = getPlayerFacing(player);
+        Facing facing = getPlayerFacing(player);
+
 
         if (getCubeNumber(playerLoc) == -1) {
             player.sendMessage(ChatColor.RED + "ERROR_NOT_IN_ROOM");
             return;
         }
 
+        if (checkPass(player)) {
+            generateCube(player);
+        } else return;
+
         Location targetBlock = player.getTargetBlock(3).getLocation();
+        Location pLoc = player.getLocation();
 
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        targetBlock.add(0,1,0).getBlock().setType(Material.LIME_CONCRETE);
 
-        if (itemInHand.getItemMeta().getDisplayName().equals("mastercard") || itemInHand.getItemMeta().getDisplayName().equals("checkcard")) {
-            if (checkKey(player, getPlayerFacing(player))) {
-                player.sendMessage("문이 열려 있습니다. 들어갑니다.");
-            } else {
-                player.sendMessage("문이 잠겨 있습니다.");
-                if (itemInHand.getItemMeta().getDisplayName().equals("mastercard")) {
-                    player.sendMessage("마스터 키카드로 문을 열고 들어갑니다.");
-                    generateCube(player);
-                }
-                else {
-                    if (plugin.pDataYmlManager.getConfig().getInt(player.getName() + ".pass") <= 0) {
-                        player.sendMessage("패스를 충전하세요.");
-                        return;
-                    }
-                    else {
-                        player.sendMessage("패스를 사용하여 문을 엽니다.");
-                        plugin.pDataYmlManager.getConfig().set(player.getName() + ".pass", plugin.pDataYmlManager.getConfig().getInt(player.getName() + ".pass") - 1);
-                        plugin.pDataYmlManager.saveConfig();
-                        generateCube(player);
-                    }
-                }
-            }
-        }
-
-        else return;
-
-        switch (s) { //move part
-            case "EAST": // 동쪽으로 감
+        switch (facing) { //move part
+            case EAST: // 동쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorE")) {
                     playerLoc[0] = playerLoc[0] + 1; // 보고있는 방향의 방 위치값을 얻음
-                    if (getCubeNumber(playerLoc) == -1) {
-                        player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
-                        return; // error
-                    }
-                    targetBlock.add(0,1,0).getBlock().setType(Material.LIME_CONCRETE);
+                    if (checkExist(player, getCubeNumber(playerLoc))) return;
                     targetBlock.add(1,0,0).getBlock().setType(Material.LIME_CONCRETE);
-                    Bukkit.getConsoleSender().sendMessage(player.getName() + ChatColor.GREEN + " : MOVED_TO_ROOM " + ChatColor.YELLOW + getCubeNumber(playerLoc));
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorW", true);
-                    plugin.ymlManager.saveConfig();
-                    Location pLoc = player.getLocation();
                     pLoc.set((playerLoc[0] * roomSize + 1.5), (playerLoc[1] * roomSize + 3), (playerLoc[2] * roomSize + halfRoomSize));
-                    player.teleport(pLoc);
                 }
                 break;
-            case "NORTH": // 북쪽으로 감
+            case NORTH: // 북쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorN")) {
                     playerLoc[2] = playerLoc[2] - 1; // 보고있는 방향의 방 위치값을 얻음
-                    if (getCubeNumber(playerLoc) == -1) {
-                        player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
-                        return; // error
-                    }
-                    targetBlock.add(0,1,0).getBlock().setType(Material.LIME_CONCRETE);
+                    if (checkExist(player, getCubeNumber(playerLoc))) return;
                     targetBlock.add(0,0,-1).getBlock().setType(Material.LIME_CONCRETE);
-                    Bukkit.getConsoleSender().sendMessage(player.getName() + ChatColor.GREEN + " : MOVED_TO_ROOM " + ChatColor.YELLOW + getCubeNumber(playerLoc));
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorS", true);
-                    plugin.ymlManager.saveConfig();
-                    Location pLoc = player.getLocation();
                     pLoc.set((playerLoc[0] * roomSize + halfRoomSize), (playerLoc[1] * roomSize + 3), (playerLoc[2] * roomSize + roomSize - 1.5));
-                    player.teleport(pLoc);
                 }
                 break;
-            case "WEST": // 서쪽으로 감
+            case WEST: // 서쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorW")) {
                     playerLoc[0] = playerLoc[0] - 1; // 보고있는 방향의 방 위치값을 얻음
-                    if (getCubeNumber(playerLoc) == -1) {
-                        player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
-                        return; // error
-                    }
-                    targetBlock.add(0,1,0).getBlock().setType(Material.LIME_CONCRETE);
+                    if (checkExist(player, getCubeNumber(playerLoc))) return;
                     targetBlock.add(-1,0,0).getBlock().setType(Material.LIME_CONCRETE);
-                    Bukkit.getConsoleSender().sendMessage(player.getName() + ChatColor.GREEN + " : MOVED_TO_ROOM " + ChatColor.YELLOW + getCubeNumber(playerLoc));
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorE", true);
-                    plugin.ymlManager.saveConfig();
-                    Location pLoc = player.getLocation();
                     pLoc.set((playerLoc[0] * roomSize + roomSize - 1.5), (playerLoc[1] * roomSize + 3), (playerLoc[2] * roomSize + halfRoomSize));
-                    player.teleport(pLoc);
                 }
                 break;
-            case "SOUTH": // 동쪽으로 감
+            case SOUTH: // 동쪽으로 감
                 if (plugin.ymlManager.getConfig().getBoolean("room." + getCubeNumber(playerLoc) + ".door." + "doorS")) {
                     playerLoc[2] = playerLoc[2] + 1; // 보고있는 방향의 방 위치값을 얻음
-                    if (getCubeNumber(playerLoc) == -1) {
-                        player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
-                        return; // error
-                    }
-                    targetBlock.add(0,1,0).getBlock().setType(Material.LIME_CONCRETE);
+                    if (checkExist(player, getCubeNumber(playerLoc))) return;
                     targetBlock.add(0,0,1).getBlock().setType(Material.LIME_CONCRETE);
-                    Bukkit.getConsoleSender().sendMessage(player.getName() + ChatColor.GREEN + " : MOVED_TO_ROOM " + ChatColor.YELLOW + getCubeNumber(playerLoc));
                     plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorN", true);
-                    plugin.ymlManager.saveConfig();
-                    Location pLoc = player.getLocation();
                     pLoc.set((playerLoc[0] * roomSize + halfRoomSize), (playerLoc[1] * roomSize + 3), (playerLoc[2] * roomSize + 1.5));
-                    player.teleport(pLoc);
                 }
                 break;
         }
+        Bukkit.getConsoleSender().sendMessage(player.getName() + ChatColor.GREEN + " : MOVED_TO_ROOM " + ChatColor.YELLOW + getCubeNumber(playerLoc));
+        plugin.ymlManager.saveConfig();
+        player.teleport(pLoc);
         clearEffect(player);
         giveEffect(player);
     } // 플레이어 이동 -> 이후 알고리즘 수정예정
+
+    public boolean checkExist(Player player,int cubeNum) {
+        if (cubeNum == -1) {
+            player.sendMessage(ChatColor.RED + "ERROR_ROOM_NO_EXIST");
+            return true; // error
+        }
+        return false;
+    }
 
     public int[] getCubedPosition(Player player) {
         int[] playerPos = new int[3];
@@ -295,14 +275,12 @@ public class cubeUtil {
         int originY = 0;
         int originZ = 0;
 
-        int tickLeft = 10;
-
         int exX = 1000000;
         int exY = 0;
         int exZ = 1000029;
 
         switch (getPlayerFacing(player)) {
-            case "EAST":
+            case EAST:
                 plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorE", true);
 
                 playerLoc[0] = playerLoc[0] + 1;
@@ -321,7 +299,7 @@ public class cubeUtil {
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", true);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", false);
                 break;
-            case "NORTH":
+            case NORTH:
                 plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorN", true);
 
                 playerLoc[2] = playerLoc[2] - 1;
@@ -340,7 +318,7 @@ public class cubeUtil {
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", true);
                 break;
-            case "WEST":
+            case WEST:
                 plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorW", true);
 
                 playerLoc[0] = playerLoc[0] - 1;
@@ -359,7 +337,7 @@ public class cubeUtil {
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorW", false);
                 plugin.ymlManager.getConfig().set("room." + getCount() + ".door." + "doorS", false);
                 break;
-            case "SOUTH":
+            case SOUTH:
                 plugin.ymlManager.getConfig().set("room." + getCubeNumber(playerLoc) + ".door." + "doorS", true);
 
                 playerLoc[2] = playerLoc[2] + 1;
@@ -380,11 +358,8 @@ public class cubeUtil {
                 break;
         }
 
-        plugin.ymlManager.getConfig().set("room." + getCount() + ".effect", cubeRandomPicker.random(cubeInitial.effectList));
-        plugin.ymlManager.getConfig().set("room." + getCount() + ".type", cubeRandomPicker.random(cubeInitial.roomType));
-        //plugin.ymlManager.getConfig().set("room." + getCount() + ".tickLeft", tickLeft);
-
-        int cnt = getCount();
+        plugin.ymlManager.getConfig().set("room." + getCount() + ".effect", util_Randomizer.random(cubeInitial.effectList));
+        plugin.ymlManager.getConfig().set("room." + getCount() + ".type", util_Randomizer.random(cubeInitial.roomType));
 
         plugin.ymlManager.getConfig().set("count", getCount() + 1);
 
@@ -410,30 +385,6 @@ public class cubeUtil {
         origin.getBlock().setType(Material.WHITE_CONCRETE);
         //roomTimer(cnt);
     } // 큐브 생성
-
-    public double[] getCubeMidPosition(int roomNo) {
-        double[] room = new double[3];
-        room[0] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locX") * roomSize) + halfRoomSize;
-        room[1] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locY") * roomSize) + 2;
-        room[2] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locZ") * roomSize) + halfRoomSize;
-        return room;
-    } //큐브 중심점 리턴
-
-    public double[] getCubeLocation(int roomNo) {
-        double[] room = new double[3];
-        room[0] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locX") * roomSize);
-        room[1] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locY") * roomSize) + 2;
-        room[2] = (plugin.ymlManager.getConfig().getInt("room." + roomNo + ".loc." + "locZ") * roomSize);
-        return room;
-    } //큐브 시작점 리턴
-
-    public int[] getPlayerCubeLocation(Player player) {
-        int[] position = new int[3];
-        position[0] = ((int) Math.round(player.getLocation().getX())) % roomSize;
-        position[1] = ((int) Math.round(player.getLocation().getY())) % roomSize;
-        position[2] = ((int) Math.round(player.getLocation().getZ())) % roomSize;
-        return position;
-    } //큐브 내에 있는 플레이어의 위치값 (정수형)
 
     /**
     public void resetRoom(int roomNo) {
@@ -528,29 +479,4 @@ public class cubeUtil {
         plugin.runBoard();
         plugin.ymlManager.saveConfig();
     } // 타이머 재시작 (스코어보드 타이머는 재시작)
-
-    public void summonBoss() {
-
-    }
-
-    public void summonMobs() {
-
-    }
-
-    private void setDoor(int xWorld, int yWorld, int zWorld, Material eDoorType, BlockFace eFace) { //안씀
-        Block bottom = Bukkit.getWorld("world").getBlockAt(xWorld, yWorld, zWorld);
-        Block top = bottom.getRelative(BlockFace.DOWN);
-        bottom.setType(eDoorType, false);
-        top.setType(eDoorType, false);
-
-        Door d1 = (Door) bottom.getBlockData();
-        Door d2 = (Door) top.getBlockData();
-        d1.setHalf(Bisected.Half.BOTTOM);
-        d2.setHalf(Bisected.Half.BOTTOM);
-        d1.setFacing(eFace);
-        d2.setFacing(eFace);
-
-        bottom.setBlockData(d1);
-        top.setBlockData(d2);
-    }
 }

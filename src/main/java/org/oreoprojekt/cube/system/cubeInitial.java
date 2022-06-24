@@ -1,6 +1,6 @@
 package org.oreoprojekt.cube.system;
 
-public class cubeInitial {
+public class cubeInitial { // 1 : 0.1%
     public static int[] effectList = new int[9];
     public static int[] roomType = new int[5];
     public static void initialize() {

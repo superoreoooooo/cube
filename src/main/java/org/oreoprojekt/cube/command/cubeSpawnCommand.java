@@ -12,10 +12,12 @@ import org.oreoprojekt.cube.util.cubeUtil;
 public class cubeSpawnCommand implements CommandExecutor {
     private CUBE plugin;
     private cubeUtil cubeUtil;
+
     public cubeSpawnCommand (CUBE plugin) {
         this.plugin = plugin;
         this.cubeUtil = new cubeUtil(plugin);
     }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {

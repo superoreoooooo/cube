@@ -1,22 +1,23 @@
-package org.oreoprojekt.cube.util;
+package org.oreoprojekt.cube.util.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import org.oreoprojekt.cube.CUBE;
+import org.oreoprojekt.cube.enums.Effect;
+import org.oreoprojekt.cube.util.cubeUtil;
 
-public class cubeScoreBoard {
+public class util_Scoreboard {
     private CUBE plugin;
-    private cubeUtil cubeUtil;
+    private org.oreoprojekt.cube.util.cubeUtil cubeUtil;
 
-    public cubeScoreBoard(CUBE plugin) {
+    public util_Scoreboard(CUBE plugin) {
         this.plugin = plugin;
         this.cubeUtil = new cubeUtil(plugin);
     }
 
     public void createBoard(Player player) {
-        ScoreboardManager scoreboardManager;
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective obj = scoreboard.registerNewObjective("Playerboard", "dummy", "【Project.kr】");
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -41,25 +42,25 @@ public class cubeScoreBoard {
         int effectNumber = plugin.ymlManager.getConfig().getInt("room." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".effect");
         switch (effectNumber + 1) {
             case 1:
-                return "중력";
+                return Effect.GRAVITY.getEfName();
             case 2:
-                return "무중력";
+                return Effect.WEIGHTLESS.getEfName();
             case 3:
-                return "연막";
+                return Effect.SMOKE.getEfName();
             case 4:
-                return "어지러움";
+                return Effect.DIZZY.getEfName();
             case 5:
-                return "배고픔";
+                return Effect.HUNGRY.getEfName();
             case 6:
-                return "피곤";
+                return Effect.TIRED.getEfName();
             case 7:
-                return "불운";
+                return Effect.MISFORTUNE.getEfName();
             case 8:
-                return "행운";
+                return Effect.FORTUNE.getEfName();
             case 9:
-                return "일반";
+                return Effect.NORMAL.getEfName();
             default:
-                return "error";
+                return Effect.ERROR.getEfName();
         }
     }
 

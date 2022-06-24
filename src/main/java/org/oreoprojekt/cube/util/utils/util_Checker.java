@@ -9,15 +9,16 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.oreoprojekt.cube.CUBE;
+import org.oreoprojekt.cube.enums.Facing;
 import org.oreoprojekt.cube.util.cubeUtil;
 
 import java.util.UUID;
 
-public class cubeUtil_Checker {
-    private CUBE plugin;
-    private cubeUtil util;
+public class util_Checker {
+    private final CUBE plugin;
+    private final cubeUtil util;
 
-    public cubeUtil_Checker(CUBE plugin) {
+    public util_Checker(CUBE plugin) {
         this.plugin = plugin;
         this.util = new cubeUtil(plugin);
     }
@@ -28,50 +29,23 @@ public class cubeUtil_Checker {
 
     public void checkerTimer() {
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "checker Started!");
-        checkerTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    killCheckers();
-                    spawnCheckers();
-                }
-            }
+        checkerTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            killCheckers();
+            spawnCheckers();
         }, 0, 20);
     }
 
     public void killCheckers() {
         int cnt = 0;
-
         for (ArmorStand checker : world.getEntitiesByClass(ArmorStand.class)) {
             if (checker.hasMetadata("pos")) {
                 String[] mData = checker.getMetadata("pos").get(0).asString().split("\\.");
-                if (mData[1].equals("O")) cubeUtil.OpenCheckerList.remove(checker.getUniqueId());
+                if (mData[1].equals("O")) cubeUtil.OpenCheckerList.remove(checker.getUniqueId()); // opened or closed
                 else cubeUtil.ClosedCheckerList.remove(checker.getUniqueId());
                 checker.remove();
                 cnt++;
             }
         }
-
-        /**
-         for (Player player : Bukkit.getOnlinePlayers()) {
-         for (ArmorStand checker : player.getWorld().getEntitiesByClass(ArmorStand.class)) {
-         if (checker.hasMetadata("pos")) {
-         String[] mData = checker.getMetadata("pos").get(0).asString().split("\\.");
-         if (!mData[0].equals(Integer.toString(util.getCubeNumber(getCubedPosition(player))))) {
-         for (Player p : Bukkit.getOnlinePlayers()) {
-         if (p == player) continue;
-         if (mData[0].equals(Integer.toString(util.getCubeNumber(getCubedPosition(p))))) continue;
-         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "player : " + p);
-         }
-         if (mData[1].equals("O")) OpenCheckerList.remove(checker.getUniqueId());
-         else ClosedCheckerList.remove(checker.getUniqueId());
-         checker.remove();
-         cnt++;
-         //player.sendMessage("killed " + "R" + mData[0] + " Facing " + mData[1] + " Open? " + mData[2]);
-         }
-         }
-         }
-         }**/ //다죽이는걸로 변경됨
         Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "killed " + cnt + "checkers!");
     }
 
@@ -80,7 +54,6 @@ public class cubeUtil_Checker {
             int[] playerLoc = util.getCubedPosition(player);
             Location[] locations = new Location[4];
             if (util.getCubeNumber(playerLoc) >= 0 && util.getCubeNumber(playerLoc) <= 8) {
-                //player.sendMessage("spawn");
                 continue;
             }
             if (util.getCubeNumber(util.getCubedPosition(player)) == -1) continue;
@@ -90,23 +63,22 @@ public class cubeUtil_Checker {
             locations[3] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.roomSize + 1, playerLoc[2] * cubeUtil.roomSize + cubeUtil.roomSize - 1.5); //SOUTH
 
             for (int c = 0; c < 4; c++) {
-                //player.sendMessage(ChatColor.YELLOW + "Spawning " + c + " checker");
                 switch (c) {
                     case 0:
-                        if (util.checkKey(player, "EAST")) spawnOpenChecker(player, locations[0], util.getCubeNumber(playerLoc) + ".E.O");
-                        else spawnClosedChecker(player, locations[0], util.getCubeNumber(playerLoc) + ".E.C");
+                        if (util.checkKey(player, Facing.EAST)) spawnChecker(player, locations[0], util.getCubeNumber(playerLoc) + ".E.O", true);
+                        else spawnChecker(player, locations[0], util.getCubeNumber(playerLoc) + ".E.C", false);
                         break;
                     case 1:
-                        if (util.checkKey(player, "NORTH")) spawnOpenChecker(player, locations[1], util.getCubeNumber(playerLoc) + ".N.O");
-                        else spawnClosedChecker(player, locations[1], util.getCubeNumber(playerLoc) + ".N.C");
+                        if (util.checkKey(player, Facing.NORTH)) spawnChecker(player, locations[1], util.getCubeNumber(playerLoc) + ".N.O", true);
+                        else spawnChecker(player, locations[1], util.getCubeNumber(playerLoc) + ".N.C", false);
                         break;
                     case 2:
-                        if (util.checkKey(player, "WEST")) spawnOpenChecker(player, locations[2], util.getCubeNumber(playerLoc) + ".W.O");
-                        else spawnClosedChecker(player, locations[2], util.getCubeNumber(playerLoc) + ".W.C");
+                        if (util.checkKey(player, Facing.WEST)) spawnChecker(player, locations[2], util.getCubeNumber(playerLoc) + ".W.O", true);
+                        else spawnChecker(player, locations[2], util.getCubeNumber(playerLoc) + ".W.C", false);
                         break;
                     case 3:
-                        if (util.checkKey(player, "SOUTH")) spawnOpenChecker(player, locations[3], util.getCubeNumber(playerLoc) + ".S.O");
-                        else spawnClosedChecker(player, locations[3], util.getCubeNumber(playerLoc) + ".S.C");
+                        if (util.checkKey(player, Facing.SOUTH)) spawnChecker(player, locations[3], util.getCubeNumber(playerLoc) + ".S.O", true);
+                        else spawnChecker(player, locations[3], util.getCubeNumber(playerLoc) + ".S.C", false);
                         break;
                 }
             }
@@ -122,7 +94,7 @@ public class cubeUtil_Checker {
                 for (ArmorStand checker : player.getWorld().getEntitiesByClass(ArmorStand.class)) {
                     if (checker.hasMetadata("pos")) {
                         String[] metaData = checker.getMetadata("pos").get(0).asString().split("\\.");
-                        player.sendMessage("room " + metaData[0] + " face " + metaData[1] + " O/C " + metaData[2]);
+                        player.sendMessage("room " + metaData[0] + " face " + metaData[1] + " : " + metaData[2]);
                         if (!metaData[0].equals(Integer.toString(i))) {
                             if (metaData[1].equals("O")) cubeUtil.OpenCheckerList.remove(checker.getUniqueId());
                             else cubeUtil.ClosedCheckerList.remove(checker.getUniqueId());
@@ -176,8 +148,25 @@ public class cubeUtil_Checker {
 
     @Deprecated
     public void spawnMainChecker() {
-        //spawnOpenChecker();
-    } //사용안됨
+    } //언젠가해야함
+
+    public void spawnChecker(Player player, Location location, String checkerName, Boolean isOpen) {
+        location.add(0, 2.5, 0);
+        ArmorStand checker = (ArmorStand) player.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+        String op = ChatColor.RED + "CLOSED";
+        if (isOpen) op = ChatColor.GREEN + "OPENED";
+        checker.setCustomName(ChatColor.GREEN + op);
+        checker.setGravity(false);
+        checker.setCanPickupItems(false);
+        checker.setVisible(false);
+        checker.setCanMove(false);
+        checker.setMarker(true);
+        checker.setCustomNameVisible(true);
+        checker.setMetadata("pos", new FixedMetadataValue(plugin, checkerName));
+
+        if (isOpen) cubeUtil.OpenCheckerList.put(checker.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
+        else cubeUtil.ClosedCheckerList.put(checker.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
+    }
 
     @Deprecated
     public void spawnChecker(Player player) {
@@ -196,25 +185,26 @@ public class cubeUtil_Checker {
             player.sendMessage(ChatColor.YELLOW + "Spawning " + c + " checker");
             switch (c) {
                 case 0:
-                    if (util.checkKey(player, "EAST")) spawnOpenChecker(player, locations[0], util.getCubeNumber(playerLoc) + ".E.O");
+                    if (util.checkKey(player, Facing.EAST)) spawnOpenChecker(player, locations[0], util.getCubeNumber(playerLoc) + ".E.O");
                     else spawnClosedChecker(player, locations[0], util.getCubeNumber(playerLoc) + ".E.C");
                     break;
                 case 1:
-                    if (util.checkKey(player, "NORTH")) spawnOpenChecker(player, locations[1], util.getCubeNumber(playerLoc) + ".N.O");
+                    if (util.checkKey(player, Facing.NORTH)) spawnOpenChecker(player, locations[1], util.getCubeNumber(playerLoc) + ".N.O");
                     else spawnClosedChecker(player, locations[1], util.getCubeNumber(playerLoc) + ".N.C");
                     break;
                 case 2:
-                    if (util.checkKey(player, "WEST")) spawnOpenChecker(player, locations[2], util.getCubeNumber(playerLoc) + ".W.O");
+                    if (util.checkKey(player, Facing.WEST)) spawnOpenChecker(player, locations[2], util.getCubeNumber(playerLoc) + ".W.O");
                     else spawnClosedChecker(player, locations[2], util.getCubeNumber(playerLoc) + ".W.C");
                     break;
                 case 3:
-                    if (util.checkKey(player, "SOUTH")) spawnOpenChecker(player, locations[3], util.getCubeNumber(playerLoc) + ".S.O");
+                    if (util.checkKey(player, Facing.SOUTH)) spawnOpenChecker(player, locations[3], util.getCubeNumber(playerLoc) + ".S.O");
                     else spawnClosedChecker(player, locations[3], util.getCubeNumber(playerLoc) + ".S.C");
                     break;
             }
         }
     } //사용안됨
 
+    @Deprecated
     public void spawnOpenChecker(Player player, Location location, String checkerName) {
         location.add(0, 2.5, 0);
         ArmorStand checkerOpen = (ArmorStand) player.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
@@ -229,6 +219,7 @@ public class cubeUtil_Checker {
         cubeUtil.OpenCheckerList.put(checkerOpen.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
     }
 
+    @Deprecated
     public void spawnClosedChecker(Player player, Location location, String checkerName) {
         location.add(0, 2.5, 0);
         ArmorStand checkerClosed = (ArmorStand) player.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
@@ -241,22 +232,6 @@ public class cubeUtil_Checker {
         checkerClosed.setCustomNameVisible(true);
         checkerClosed.setMetadata("pos", new FixedMetadataValue(plugin, checkerName));
         cubeUtil.ClosedCheckerList.put(checkerClosed.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
-    }
-
-    @Deprecated
-    public void countChecker(Player player) {
-        if (cubeUtil.OpenCheckerList.size() == 0 && cubeUtil.ClosedCheckerList.size() == 0) {
-            player.sendMessage("NULL");
-            return;
-        }
-        for (UUID uuid : cubeUtil.OpenCheckerList.keySet()) {
-            if (Bukkit.getEntity(uuid) == null) return;
-            player.sendMessage("O : " + uuid + cubeUtil.OpenCheckerList.get(uuid) + " DATA : " + Bukkit.getEntity(uuid).getMetadata("pos").get(0).asString());
-        }
-        for (UUID uuid : cubeUtil.ClosedCheckerList.keySet()) {
-            if (Bukkit.getEntity(uuid) == null) return;
-            player.sendMessage("C : " + uuid + cubeUtil.OpenCheckerList.get(uuid) + " DATA : " + Bukkit.getEntity(uuid).getMetadata("pos").get(0).asString());
-        }
     }
 
     public int countCheckers() {

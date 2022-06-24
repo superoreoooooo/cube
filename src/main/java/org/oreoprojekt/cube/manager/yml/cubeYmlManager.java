@@ -1,4 +1,4 @@
-package org.oreoprojekt.cube.manager;
+package org.oreoprojekt.cube.manager.yml;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,25 +11,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 
-public class pDataYmlManager {
+public class cubeYmlManager {
     private final CUBE plugin;
     private FileConfiguration dataConfig = null;
     private File configFile = null;
 
 
-    public pDataYmlManager(CUBE plugin) {
+    public cubeYmlManager(CUBE plugin) {
         this.plugin = plugin;
         saveDefaultConfig();
     }
 
     public void reloadConfig() {
         if (this.configFile == null) {
-
-            this.configFile = new File(this.plugin.getDataFolder(), "playerdata.yml");
+            this.configFile = new File(this.plugin.getDataFolder(), "cube.yml");
         }
         this.dataConfig = YamlConfiguration.loadConfiguration(this.configFile);
 
-        InputStream defaultStream = this.plugin.getResource("playerdata.yml");
+        InputStream defaultStream = this.plugin.getResource("cube.yml");
         if (defaultStream != null) {
             YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
             this.dataConfig.setDefaults(defaultConfig);
@@ -40,7 +39,6 @@ public class pDataYmlManager {
         if (this.dataConfig == null) {
             reloadConfig();
         }
-
         return this.dataConfig;
     }
 
@@ -57,10 +55,10 @@ public class pDataYmlManager {
 
     public void saveDefaultConfig() {
         if (this.configFile == null) {
-            this.configFile = new File(this.plugin.getDataFolder(), "playerdata.yml");
+            this.configFile = new File(this.plugin.getDataFolder(), "cube.yml");
         }
         if (!(this.configFile.exists())) {
-            this.plugin.saveResource("playerdata.yml", false);
+            this.plugin.saveResource("cube.yml", false);
         }
     }
 }
