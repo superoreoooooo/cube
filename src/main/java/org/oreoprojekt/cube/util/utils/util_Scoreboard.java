@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 import org.oreoprojekt.cube.CUBE;
 import org.oreoprojekt.cube.enums.Effect;
+import org.oreoprojekt.cube.enums.RoomType;
 import org.oreoprojekt.cube.util.cubeUtil;
 
 public class util_Scoreboard {
@@ -39,41 +40,35 @@ public class util_Scoreboard {
     }
 
     public String getEffect(Player player) {
-        int effectNumber = plugin.ymlManager.getConfig().getInt("room." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".effect");
-        switch (effectNumber + 1) {
-            case 1:
-                return Effect.GRAVITY.getEfName();
-            case 2:
-                return Effect.WEIGHTLESS.getEfName();
-            case 3:
-                return Effect.SMOKE.getEfName();
-            case 4:
-                return Effect.DIZZY.getEfName();
-            case 5:
-                return Effect.HUNGRY.getEfName();
-            case 6:
-                return Effect.TIRED.getEfName();
-            case 7:
-                return Effect.MISFORTUNE.getEfName();
-            case 8:
-                return Effect.FORTUNE.getEfName();
-            case 9:
-                return Effect.NORMAL.getEfName();
-            default:
-                return Effect.ERROR.getEfName();
+        int effectNum = plugin.ymlManager.getConfig().getInt("room." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".effect");
+        String effectName = Effect.ERROR.getEfName();
+        for (Effect name : Effect.values()) {
+            if (name.getEfNum() == effectNum) {
+                effectName = name.getEfName();
+            }
         }
+        for (Effect name : Effect.values()) {
+            if (name.getEfName().equals(effectName)) {
+                return name.getEfName();
+            }
+        }
+        return Effect.ERROR.getEfName();
     }
 
     public String getType(Player player) {
         int typeNum = plugin.ymlManager.getConfig().getInt("room." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".type");
-        switch (typeNum) {
-            case 0:
-                return "일반";
-            case 1:
-                return "보스";
-            default:
-                return "error";
+        String typeName = RoomType.ERROR.getName();
+        for (RoomType roomType : RoomType.values()) {
+            if (roomType.getNum() == typeNum) {
+                typeName = roomType.getName();
+            }
         }
+        for (RoomType type : RoomType.values()) {
+            if (type.getName().equals(typeName)) {
+                return type.getName();
+            }
+        }
+        return RoomType.ERROR.getName();
     }
 
     public int task;

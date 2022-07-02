@@ -386,24 +386,6 @@ public class cubeUtil {
         //roomTimer(cnt);
     } // 큐브 생성
 
-    /**
-    public void resetRoom(int roomNo) {
-        double[] loc = getCubeMidPosition(roomNo);
-        double[] cubePos = getCubePosition(roomNo);
-        Location location = new Location(Bukkit.getWorld("world"), loc[0], 7, loc[2]);
-        for (Entity entity : location.getWorld().getEntities()) {
-            if (entity.getLocation().getX() > cubePos[0]
-                    && entity.getLocation().getX() < cubePos[0] + roomSize
-                    && entity.getLocation().getZ() > cubePos[2]
-                    && entity.getLocation().getZ() < cubePos[2] + roomSize) {
-                if (!(entity instanceof Player)) {
-                    entity.remove();
-                }
-            }
-        }
-        Bukkit.getWorld("world").spawnEntity(location, EntityType.GIANT);
-    } // 방 몹 초기화 이후 기능추가예정 //제거**/
-
     public void giveEffect(Player player) {
         cubeInitial.initialize();
         int effectNumber = plugin.ymlManager.getConfig().getInt("room." + getCubeNumber(getCubedPosition(player)) + ".effect");

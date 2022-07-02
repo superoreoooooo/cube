@@ -32,7 +32,6 @@ public class util_Randomizer {
                 cnt++;
             }
         }
-
         return ret;
     }
 }
