@@ -363,6 +363,8 @@ public class cubeUtil {
 
         plugin.ymlManager.getConfig().set("count", getCount() + 1);
 
+        //test
+
         plugin.ymlManager.saveConfig();
 
         Location origin = new Location(player.getWorld(), originX, originY, originZ);
