@@ -1,6 +1,7 @@
 package org.oreoprojekt.cube.enums;
 
 public enum Effect {
+    SPAWN("스폰", -2),
     GRAVITY("중력", 0),
     WEIGHTLESS("무중력", 1),
     SMOKE("연막", 2),

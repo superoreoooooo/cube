@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.oreoprojekt.cube.command.cubeMainCommand;
 import org.oreoprojekt.cube.command.cubeSpawnCommand;
+import org.oreoprojekt.cube.command.rl;
 import org.oreoprojekt.cube.listener.cubeListener;
 import org.oreoprojekt.cube.manager.yml.cubeYmlManager;
 import org.oreoprojekt.cube.manager.yml.pDataYmlManager;
@@ -30,6 +31,7 @@ public final class CUBE extends JavaPlugin {
 
         getCommand("cube").setExecutor(new cubeMainCommand(this));
         getCommand("spawn").setExecutor(new cubeSpawnCommand(this));
+        getCommand("rl").setExecutor(new rl());
 
         this.ymlManager = new cubeYmlManager(this);
         this.pDataYmlManager = new pDataYmlManager(this);
@@ -37,12 +39,15 @@ public final class CUBE extends JavaPlugin {
         this.util_Checker = new util_Checker(this);
 
         cubeUtil.checkMain();
+        cubeUtil.startTimer();
 
         util_Checker.checkerTimer();
 
         //cubeUtil.startTimer();
 
         runBoard();
+
+        Bukkit.broadcastMessage(ChatColor.GREEN + "cube system on");
     }
 
     @Override

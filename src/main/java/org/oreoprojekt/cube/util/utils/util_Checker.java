@@ -25,7 +25,9 @@ public class util_Checker {
 
     World world = cubeUtil.world;
 
-    public int checkerTask;
+    public static int checkerTask;
+
+    private static int ct = 0;
 
     public void checkerTimer() {
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "checker Started!");
@@ -46,7 +48,7 @@ public class util_Checker {
                 cnt++;
             }
         }
-        Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "killed " + cnt + "checkers!");
+        if (cnt > 0) Bukkit.getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + "killed " + cnt + "checkers!");
     }
 
     public void spawnCheckers() {
@@ -57,10 +59,10 @@ public class util_Checker {
                 continue;
             }
             if (util.getCubeNumber(util.getCubedPosition(player)) == -1) continue;
-            locations[0] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + cubeUtil.roomSize - 1.5, playerLoc[1] * cubeUtil.roomSize + 1, playerLoc[2] * cubeUtil.roomSize + cubeUtil.halfRoomSize); //EAST
-            locations[1] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.roomSize + 1, playerLoc[2] * cubeUtil.roomSize + 1.5); //NORTH
-            locations[2] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + 1.5, playerLoc[1] * cubeUtil.roomSize + 1, playerLoc[2] * cubeUtil.roomSize + cubeUtil.halfRoomSize); //WEST
-            locations[3] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.roomSize + 1, playerLoc[2] * cubeUtil.roomSize + cubeUtil.roomSize - 1.5); //SOUTH
+            locations[0] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + cubeUtil.cubeSize - 1.5, playerLoc[1] * cubeUtil.cubeSize + 1, playerLoc[2] * cubeUtil.cubeSize + cubeUtil.halfRoomSize); //EAST
+            locations[1] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.cubeSize + 1, playerLoc[2] * cubeUtil.cubeSize + 1.5); //NORTH
+            locations[2] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + 1.5, playerLoc[1] * cubeUtil.cubeSize + 1, playerLoc[2] * cubeUtil.cubeSize + cubeUtil.halfRoomSize); //WEST
+            locations[3] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.cubeSize + 1, playerLoc[2] * cubeUtil.cubeSize + cubeUtil.cubeSize - 1.5); //SOUTH
 
             for (int c = 0; c < 4; c++) {
                 switch (c) {
@@ -94,7 +96,7 @@ public class util_Checker {
                 for (ArmorStand checker : player.getWorld().getEntitiesByClass(ArmorStand.class)) {
                     if (checker.hasMetadata("pos")) {
                         String[] metaData = checker.getMetadata("pos").get(0).asString().split("\\.");
-                        player.sendMessage("room " + metaData[0] + " face " + metaData[1] + " : " + metaData[2]);
+                        player.sendMessage("cube " + metaData[0] + " face " + metaData[1] + " : " + metaData[2]);
                         if (!metaData[0].equals(Integer.toString(i))) {
                             if (metaData[1].equals("O")) cubeUtil.OpenCheckerList.remove(checker.getUniqueId());
                             else cubeUtil.ClosedCheckerList.remove(checker.getUniqueId());
@@ -142,8 +144,7 @@ public class util_Checker {
          cnt++;
          }
         */
-
-        Bukkit.getConsoleSender().sendMessage("Killed " + cnt + " checkers!");
+        //Bukkit.getConsoleSender().sendMessage("Killed " + cnt + " checkers!");
     } //사용안됨
 
     @Deprecated
@@ -155,7 +156,7 @@ public class util_Checker {
         ArmorStand checker = (ArmorStand) player.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
         String op = ChatColor.RED + "CLOSED";
         if (isOpen) op = ChatColor.GREEN + "OPENED";
-        checker.setCustomName(ChatColor.GREEN + op);
+        checker.setCustomName(op);
         checker.setGravity(false);
         checker.setCanPickupItems(false);
         checker.setVisible(false);
@@ -176,10 +177,10 @@ public class util_Checker {
             //player.sendMessage("spawn");
             return;
         }
-        locations[0] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + cubeUtil.roomSize -2, playerLoc[1] * cubeUtil.roomSize + 2, playerLoc[2] * cubeUtil.roomSize + cubeUtil.halfRoomSize); //EAST
-        locations[1] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.roomSize + 2, playerLoc[2] * cubeUtil.roomSize + 2); //NORTH
-        locations[2] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + 2, playerLoc[1] * cubeUtil.roomSize + 2, playerLoc[2] * cubeUtil.roomSize + cubeUtil.halfRoomSize); //WEST
-        locations[3] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.roomSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.roomSize + 2, playerLoc[2] * cubeUtil.roomSize + cubeUtil.roomSize - 2); //SOUTH
+        locations[0] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + cubeUtil.cubeSize -2, playerLoc[1] * cubeUtil.cubeSize + 2, playerLoc[2] * cubeUtil.cubeSize + cubeUtil.halfRoomSize); //EAST
+        locations[1] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.cubeSize + 2, playerLoc[2] * cubeUtil.cubeSize + 2); //NORTH
+        locations[2] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + 2, playerLoc[1] * cubeUtil.cubeSize + 2, playerLoc[2] * cubeUtil.cubeSize + cubeUtil.halfRoomSize); //WEST
+        locations[3] = new Location(player.getWorld(), playerLoc[0] * cubeUtil.cubeSize + cubeUtil.halfRoomSize, playerLoc[1] * cubeUtil.cubeSize + 2, playerLoc[2] * cubeUtil.cubeSize + cubeUtil.cubeSize - 2); //SOUTH
 
         for (int c = 0; c < 4; c++) {
             player.sendMessage(ChatColor.YELLOW + "Spawning " + c + " checker");

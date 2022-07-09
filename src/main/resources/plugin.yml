@@ -1,10 +1,12 @@
 name: CUBE
 version: '${project.version}'
 main: org.oreoprojekt.cube.CUBE
-api-version: 1.16
+api-version: 1.19
 commands:
   cube:
+  rl:
+    aliases:
+      - r
   spawn:
     aliases:
-      - sp
       - ss

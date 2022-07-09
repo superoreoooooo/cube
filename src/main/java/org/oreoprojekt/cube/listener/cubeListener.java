@@ -2,6 +2,7 @@ package org.oreoprojekt.cube.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,7 +39,7 @@ public class cubeListener implements Listener {
         if (e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
             if (player.getInventory().getItemInMainHand().getType().equals(Material.BLAZE_ROD)) {
                 e.setCancelled(true);
-                player.sendMessage("cnt : " + Util_Checker.countCheckers());
+                cubeUtil.printPlayerLoc(player);
             }
         }
         if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
@@ -46,6 +47,10 @@ public class cubeListener implements Listener {
                 if (player.getInventory().getItemInMainHand().getItemMeta() == null) {
                     player.sendMessage("카드를 들고 눌러주세요.");
                     e.setCancelled(true);
+                    return;
+                }
+                if (player.getInventory().getItemInMainHand().getType().equals(Material.DIAMOND_AXE)) {
+                    player.sendMessage("난 무적이다");
                     return;
                 }
                 switch (player.getInventory().getItemInMainHand().getItemMeta().getDisplayName()) {
@@ -74,6 +79,7 @@ public class cubeListener implements Listener {
         cubeUtil.restartTimer();
         pDataYmlManager.getConfig().set(e.getPlayer().getName() + ".pass", 5);
         pDataYmlManager.saveConfig();
+        Util_Checker.checkerTimer();
     }
 
     @EventHandler

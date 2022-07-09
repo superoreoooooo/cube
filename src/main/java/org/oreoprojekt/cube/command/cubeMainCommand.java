@@ -1,13 +1,10 @@
 package org.oreoprojekt.cube.command;
 
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,11 +16,11 @@ import java.util.List;
 
 public class cubeMainCommand implements CommandExecutor {
     public CUBE plugin;
-    private final cubeUtil cubeUtil;
+    private final cubeUtil cubeUtils;
 
     public cubeMainCommand(CUBE plugin) {
         this.plugin = plugin;
-        this.cubeUtil = new cubeUtil(plugin);
+        this.cubeUtils = new cubeUtil(plugin);
     }
 
     @Override
@@ -38,12 +35,12 @@ public class cubeMainCommand implements CommandExecutor {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("stop")) {
                 player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.stop"));
-                cubeUtil.restartTimer();
+                cubeUtils.restartTimer();
                 return true;
             }
             if (args[0].equalsIgnoreCase("start")) {
                 player.sendMessage(ChatColor.RED + plugin.getConfig().getString("message.start"));
-                cubeUtil.startTimer();
+                cubeUtils.startTimer();
                 return true;
             }
             if (args[0].equalsIgnoreCase("reset")) {
@@ -64,6 +61,9 @@ public class cubeMainCommand implements CommandExecutor {
             if (args[0].equalsIgnoreCase("charge")) {
                 plugin.pDataYmlManager.getConfig().set(player.getName() + ".pass", 1);
                 plugin.pDataYmlManager.saveConfig();
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("mute")) {
                 return true;
             }
             if (args[0].equalsIgnoreCase("item")) {
