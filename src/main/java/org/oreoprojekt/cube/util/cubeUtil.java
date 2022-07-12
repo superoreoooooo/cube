@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.oreoprojekt.cube.CUBE;
+import org.oreoprojekt.cube.enums.Effect;
 import org.oreoprojekt.cube.enums.Facing;
 import org.oreoprojekt.cube.system.cubeInitial;
 import org.oreoprojekt.cube.util.utils.util_Checker;
@@ -188,7 +189,7 @@ public class cubeUtil {
                 }
                 break;
         }
-        Bukkit.getConsoleSender().sendMessage(player.getName() + ChatColor.GREEN + " : MOVED_TO_ROOM" + ChatColor.YELLOW + "L" + getLevel(player) + " R" + getCubeNumber(playerLoc));
+        Bukkit.getConsoleSender().sendMessage(player.getName() + ChatColor.GREEN + " : MOVED_TO_ROOM : " + ChatColor.YELLOW + "L" + getLevel(player) + " R" + getCubeNumber(playerLoc));
         plugin.ymlManager.saveConfig();
         player.teleport(pLoc);
         clearEffect(player);
@@ -260,32 +261,40 @@ public class cubeUtil {
     } // 메인 큐브 여부 확인 솔직히 쓸데없음
 
     public void generateMainCube(int level) {
-        int c = 0;
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".loc." + "locX", 0);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".loc." + "locY", level);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".loc." + "locZ", 0);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorE", false);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorN", false);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorW", false);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorS", false);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".type", -2);
-        plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".effect", 8);
-        plugin.ymlManager.getConfig().set("level." + level + ".count", 1);
-        plugin.ymlManager.getConfig().set("total", getCount() + 1);
-        plugin.ymlManager.getConfig().set("level." + "levelCount", getLevels() + 1);
-        plugin.ymlManager.saveConfig();
-        int originX = 0;
-        int originZ = 0;
+        int ax = -1;
+        int az = -1;
+        for (int c = 0; c < 9; c++) {
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".loc." + "locX", ax);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".loc." + "locY", level);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".loc." + "locZ", az);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorE", false);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorN", false);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorW", false);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".door." + "doorS", false);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".type", -2);
+            plugin.ymlManager.getConfig().set("level." + level + ".cube." + c + ".effect", 8);
+            plugin.ymlManager.getConfig().set("level." + level + ".count", getLvlCount(level) + 1);
+            plugin.ymlManager.getConfig().set("total", getCount() + 1);
+            plugin.ymlManager.getConfig().set("level." + "levelCount", getLevels() + 1);
+            plugin.ymlManager.saveConfig();
+            az += 1;
+            if (az == 2) {
+                ax += 1;
+                az = -1;
+            }
+        }
+        int originX = -29;
+        int originZ = -29;
         int originY = level * cubeSize;
-        int exX = 1000000;
+        int exX = 999971;
         int exY = 0;
-        int exZ = 1000000;
+        int exZ = 999971;
 
         Location origin = new Location(Bukkit.getWorld("world"), originX, originY, originZ);
         Location ex = new Location(Bukkit.getWorld("world"), exX, exY, exZ);
 
-        for (int x = 0; x < cubeSize; x++) {
-            for (int z = 0; z < cubeSize; z++) {
+        for (int x = 0; x < cubeSize * 3; x++) {
+            for (int z = 0; z < cubeSize * 3; z++) {
                 for (int y = 0; y < cubeSize; y++) {
                     origin.getBlock().setType(ex.getBlock().getType());
                     origin.set(originX + x, originY + y, originZ + z);
@@ -297,14 +306,13 @@ public class cubeUtil {
 
     public void generateCube(Player player) {
         int[] playerLoc = getCubedPosition(player);
-        int level = getLevel(player);
         int originX = 0;
-        int originY = level * cubeSize;
+        int originY = 0;
         int originZ = 0;
 
         int exX = 1000000;
         int exY = 0;
-        int exZ = 1000000 + cubeSize;
+        int exZ = 1000000 + 2 * cubeSize;
 
         plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".door." + "doorE", false);
         plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".door." + "doorN", false);
@@ -379,6 +387,10 @@ public class cubeUtil {
         int effectNumber = plugin.ymlManager.getConfig().getInt("level." + getLevel(player) + ".cube." + getCubeNumber(getCubedPosition(player)) + ".effect");
         if (player.getGameMode().equals(GameMode.CREATIVE)) return;
         switch (effectNumber) {
+            case -1:
+                clearEffect(player);
+                player.sendMessage("ERROR");
+                break;
             case 0:
                 player.addPotionEffect(PotionEffectType.SLOW.createEffect(10000,10));
                 break;

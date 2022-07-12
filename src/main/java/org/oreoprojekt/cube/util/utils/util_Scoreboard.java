@@ -50,10 +50,10 @@ public class util_Scoreboard {
     }
 
     public String getEffect(Player player) {
-        int effectNum = plugin.ymlManager.getConfig().getInt("cube." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".effect");
-        String effectName = Effect.ERROR.getEfName();
+        int effectNum = plugin.ymlManager.getConfig().getInt( "level." + cubeUtil.getLevel(player) + ".cube." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".effect");
         for (Effect name : Effect.values()) {
             if (name.getEfNum() == effectNum) {
+                if (!cubeUtil.cubeCheck(cubeUtil.getCubedPosition(player))) return Effect.ERROR.getEfName();
                 return name.getEfName();
             }
         }
@@ -61,7 +61,7 @@ public class util_Scoreboard {
     }
 
     public String getType(Player player) {
-        int typeNum = plugin.ymlManager.getConfig().getInt("cube." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".type");
+        int typeNum = plugin.ymlManager.getConfig().getInt("level." + cubeUtil.getLevel(player) + ".cube." + cubeUtil.getCubeNumber(cubeUtil.getCubedPosition(player)) + ".type");
         String typeName = CubeType.ERROR.getName();
         for (CubeType cubeType : CubeType.values()) {
             if (cubeType.getNum() == typeNum) {
@@ -70,6 +70,7 @@ public class util_Scoreboard {
         }
         for (CubeType type : CubeType.values()) {
             if (type.getName().equals(typeName)) {
+                if (!cubeUtil.cubeCheck(cubeUtil.getCubedPosition(player))) return CubeType.ERROR.getName();
                 return type.getName();
             }
         }

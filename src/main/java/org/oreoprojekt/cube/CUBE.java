@@ -43,8 +43,6 @@ public final class CUBE extends JavaPlugin {
 
         util_Checker.checkerTimer();
 
-        //cubeUtil.startTimer();
-
         runBoard();
 
         Bukkit.broadcastMessage(ChatColor.GREEN + "cube system on");
