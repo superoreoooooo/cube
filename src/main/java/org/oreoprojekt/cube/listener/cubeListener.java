@@ -1,13 +1,15 @@
 package org.oreoprojekt.cube.listener;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.oreoprojekt.cube.CUBE;
 import org.oreoprojekt.cube.manager.yml.pDataYmlManager;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class cubeListener implements Listener {
-    private final CUBE plugin;
+    private final JavaPlugin plugin;
     private final cubeUtil cubeUtil;
     private final pDataYmlManager pDataYmlManager;
     private final util_Checker Util_Checker;
@@ -26,11 +28,11 @@ public class cubeListener implements Listener {
     BukkitScheduler scheduler = Bukkit.getScheduler();
     List<Player> coolDown = new ArrayList<>();
 
-    public cubeListener(CUBE plugin) {
-        this.plugin = plugin;
-        this.cubeUtil = new cubeUtil(plugin);
-        this.pDataYmlManager = new pDataYmlManager(plugin);
-        this.Util_Checker = new util_Checker(plugin);
+    public cubeListener() {
+        this.plugin = JavaPlugin.getPlugin(CUBE.class);
+        this.cubeUtil = new cubeUtil(CUBE.getPlugin(CUBE.class));
+        this.pDataYmlManager = new pDataYmlManager(CUBE.getPlugin(CUBE.class));
+        this.Util_Checker = new util_Checker(CUBE.getPlugin(CUBE.class));
     }
 
     @EventHandler

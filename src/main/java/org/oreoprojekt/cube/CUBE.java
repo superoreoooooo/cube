@@ -27,7 +27,7 @@ public final class CUBE extends JavaPlugin {
         this.saveDefaultConfig();
 
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "CUBE ON");
-        getServer().getPluginManager().registerEvents(new cubeListener(this), this);
+        getServer().getPluginManager().registerEvents(new cubeListener(), this);
 
         getCommand("cube").setExecutor(new cubeMainCommand(this));
         getCommand("spawn").setExecutor(new cubeSpawnCommand(this));
