@@ -2,7 +2,7 @@ package org.oreoprojekt.cube.util.utils;
 
 import java.util.Random;
 
-public class util_Randomizer {
+public class randomizer {
     public static int random(int[] percentages) { //0번칸부터 n-1번칸까지 n개 각각 칸에 확률 리턴 : 칸번호 -1: error
         Random random = new Random();
 

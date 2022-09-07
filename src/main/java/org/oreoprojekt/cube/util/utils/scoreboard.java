@@ -9,11 +9,11 @@ import org.oreoprojekt.cube.enums.Effect;
 import org.oreoprojekt.cube.enums.CubeType;
 import org.oreoprojekt.cube.util.cubeUtil;
 
-public class util_Scoreboard {
+public class scoreboard {
     private CUBE plugin;
     private org.oreoprojekt.cube.util.cubeUtil cubeUtil;
 
-    public util_Scoreboard(CUBE plugin) {
+    public scoreboard(CUBE plugin) {
         this.plugin = plugin;
         this.cubeUtil = new cubeUtil(plugin);
     }

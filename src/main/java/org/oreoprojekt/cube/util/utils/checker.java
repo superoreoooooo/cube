@@ -14,11 +14,11 @@ import org.oreoprojekt.cube.util.cubeUtil;
 
 import java.util.UUID;
 
-public class util_Checker {
+public class checker {
     private final CUBE plugin;
     private final cubeUtil util;
 
-    public util_Checker(CUBE plugin) {
+    public checker(CUBE plugin) {
         this.plugin = plugin;
         this.util = new cubeUtil(plugin);
     }
@@ -40,8 +40,8 @@ public class util_Checker {
     public void killCheckers() {
         int cnt = 0;
         for (ArmorStand checker : world.getEntitiesByClass(ArmorStand.class)) {
-            if (checker.hasMetadata("pos")) {
-                String[] mData = checker.getMetadata("pos").get(0).asString().split("\\.");
+            if (checker.hasMetadata("position")) {
+                String[] mData = checker.getMetadata("position").get(0).asString().split("\\.");
                 if (mData[1].equals("O")) cubeUtil.OpenCheckerList.remove(checker.getUniqueId()); // opened or closed
                 else cubeUtil.ClosedCheckerList.remove(checker.getUniqueId());
                 checker.remove();
@@ -85,6 +85,23 @@ public class util_Checker {
                 }
             }
         }
+    }
+
+    public void spawnChecker(Player player, Location location, String checkerName, Boolean isOpen) {
+        location.add(0, 2.5, 0);
+        ArmorStand checker = (ArmorStand) player.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+        String op = isOpen ? ChatColor.GREEN + "OPENED" : ChatColor.RED + "CLOSED";
+        checker.setCustomName(op);
+        checker.setGravity(false);
+        checker.setCanPickupItems(false);
+        checker.setVisible(false);
+        checker.setCanMove(false);
+        checker.setMarker(true);
+        checker.setCustomNameVisible(true);
+        checker.setMetadata("position", new FixedMetadataValue(plugin, checkerName));
+
+        if (isOpen) cubeUtil.OpenCheckerList.put(checker.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
+        else cubeUtil.ClosedCheckerList.put(checker.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
     }
 
     @Deprecated
@@ -150,24 +167,6 @@ public class util_Checker {
     @Deprecated
     public void spawnMainChecker() {
     } //언젠가해야함
-
-    public void spawnChecker(Player player, Location location, String checkerName, Boolean isOpen) {
-        location.add(0, 2.5, 0);
-        ArmorStand checker = (ArmorStand) player.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
-        String op = ChatColor.RED + "CLOSED";
-        if (isOpen) op = ChatColor.GREEN + "OPENED";
-        checker.setCustomName(op);
-        checker.setGravity(false);
-        checker.setCanPickupItems(false);
-        checker.setVisible(false);
-        checker.setCanMove(false);
-        checker.setMarker(true);
-        checker.setCustomNameVisible(true);
-        checker.setMetadata("pos", new FixedMetadataValue(plugin, checkerName));
-
-        if (isOpen) cubeUtil.OpenCheckerList.put(checker.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
-        else cubeUtil.ClosedCheckerList.put(checker.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
-    }
 
     @Deprecated
     public void spawnChecker(Player player) {
@@ -235,6 +234,7 @@ public class util_Checker {
         cubeUtil.ClosedCheckerList.put(checkerClosed.getUniqueId(), util.getCubeNumber(util.getCubedPosition(player)));
     }
 
+    @Deprecated
     public int countCheckers() {
         int cnt = 0;
         if (cubeUtil.OpenCheckerList.size() == 0 && cubeUtil.ClosedCheckerList.size() == 0) {

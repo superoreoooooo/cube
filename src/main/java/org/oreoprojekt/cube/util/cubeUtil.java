@@ -8,8 +8,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.oreoprojekt.cube.CUBE;
 import org.oreoprojekt.cube.enums.Facing;
 import org.oreoprojekt.cube.system.cubeInitial;
-import org.oreoprojekt.cube.util.utils.util_Checker;
-import org.oreoprojekt.cube.util.utils.util_Randomizer;
+import org.oreoprojekt.cube.util.utils.randomizer;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -17,13 +16,13 @@ import java.util.UUID;
 public class cubeUtil {
     private final CUBE plugin;
 
-    public static HashMap<UUID, Integer> OpenCheckerList = new HashMap<>(); //체커 / 방번호
-    public static HashMap<UUID, Integer> ClosedCheckerList = new HashMap<>(); //체커 / 방번호
+    public static HashMap<UUID, Integer> OpenCheckerList = new HashMap<>();                 //체커 | 방번호
+    public static HashMap<UUID, Integer> ClosedCheckerList = new HashMap<>();               //체커 | 방번호
     public static int cubeSize = 29;
     public static double halfRoomSize = (double) cubeSize / 2;
     public static final World world = Bukkit.getWorld("world");
 
-    private util_Checker checker;
+    private org.oreoprojekt.cube.util.utils.checker checker;
 
     Boolean timer = false;
 
@@ -33,7 +32,7 @@ public class cubeUtil {
 
     public int getCount() {
         return plugin.ymlManager.getConfig().getInt("total");
-    } // 방 개수 리턴
+    }   // 방 개수 리턴
 
     public int getLvlCount(int level) {
         return plugin.ymlManager.getConfig().getInt("level." + level + ".count");
@@ -50,13 +49,13 @@ public class cubeUtil {
 
     public Facing getPlayerFacing(Player player) {
         switch (player.getTargetBlock(3).getType()) {
-            case DIAMOND_BLOCK: //East
+            case DIAMOND_BLOCK:                 //East
                 return Facing.EAST;
-            case EMERALD_BLOCK: //North
+            case EMERALD_BLOCK:                 //North
                 return Facing.NORTH;
-            case GOLD_BLOCK: //West
+            case GOLD_BLOCK:                    //West
                 return Facing.WEST;
-            case NETHERITE_BLOCK: //South
+            case NETHERITE_BLOCK:               //South
                 return Facing.SOUTH;
         }
         return Facing.ERROR;
@@ -354,8 +353,8 @@ public class cubeUtil {
         plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".loc." + "locY", playerLoc[1]);
         plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".loc." + "locZ", playerLoc[2]);
 
-        plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".effect", util_Randomizer.random(cubeInitial.effectList));
-        plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".type", util_Randomizer.random(cubeInitial.cubeType));
+        plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".effect", randomizer.random(cubeInitial.effectList));
+        plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".cube." + getLvlCount(getLevel(player)) + ".type", randomizer.random(cubeInitial.cubeType));
 
         plugin.ymlManager.getConfig().set("level." + getLevel(player) + ".count", getLvlCount(getLevel(player)) + 1);
         plugin.ymlManager.getConfig().set("count", getCount() + 1);
