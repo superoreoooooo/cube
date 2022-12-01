@@ -361,12 +361,12 @@ public class cubeUtil {
 
         plugin.ymlManager.saveConfig();
 
-        Location origin = new Location(player.getWorld(), originX, originY, originZ);
-        Location ex = new Location(player.getWorld(), exX, exY, exZ);
-
         originX = (playerLoc[0] * cubeSize);
         originY = (playerLoc[1] * cubeSize);
         originZ = (playerLoc[2] * cubeSize);
+
+        Location origin = new Location(player.getWorld(), originX, originY, originZ);
+        Location ex = new Location(player.getWorld(), exX, exY, exZ);
 
         for (int x = 0; x < cubeSize; x++) {
             for (int z = 0; z < cubeSize; z++) {
